@@ -1,29 +1,49 @@
+<?php
+if (!isset($_SESSION)) {
+    session_start();
+}
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+    include '../Models/productClass.php';
+    $product = new Product();
+    $productData = $product->getProduct($id);
+    if (!is_array($productData)) {
+        header('Location: ' . filter_var('../Veiw/home.php', FILTER_SANITIZE_URL));
+    }
+    $rateData = $product->selectRate($id);
+} else {
+    header('Location: ' . filter_var('../Veiw/home.php', FILTER_SANITIZE_URL));
+}
+?>
 <?php include 'NavBar.php'; ?>
-
 
 <div class="container-fluid myNavTabs">
     <ul class="nav nav-tabs nav-justified">
         <?php
-            echo '<li class="active"><a href="#defention" data-toggle="pill">' . $Admin_Product["definition"] . '</a></li>
+        echo '<li class="active"><a href="#defention" data-toggle="pill">' . $Admin_Product["definition"] . '</a></li>
                 <li><a href="#structure" data-toggle="pill">' . $Admin_Product["structure"] . '</a></li>
                 <li><a href="#usingWay" data-toggle="pill">' . $Admin_Product["using_way"] . '</a></li>
-                <li><a href="#advantages" data-toggle="pill">' . $Admin_Product["advantages"] . '</a></li>';
+                <li><a href="#advantages" data-toggle="pill">' . $Admin_Product["rate_of_use"] . '</a></li>';
         ?>
     </ul>
     <div class="tab-content">
         <div id="defention" class="tab-pane fade in active">
             <div class="row">
                 <div class="col-sm-5 prod_img ">
-                    <img src="../Resources/IMG/prod_01.jpg">
+
+                    <img src="../Resources/ProductImages/<?php echo $productData['image']; ?>">
                 </div>
                 <?php
-                    echo '<div class="col-sm-7 prod_info ">
-                    <h4 class="page-header">كونكور وصل والأكاروس �?صل</h4>
-                    <p class="well">
-                    يشمل برنامج للمكا�?حة المتكاملة IPM للأكاروسات إتباع طرق الخدمة الزراعية خاصة التخلص من الحشائش، والري المنتظم والتسميد المتوازن لتقوية النباتات، وتستخدم المكا�?حة الكيماوية قبل الحدود الإقتصادية الحرجة للأكاروسات وتبلغ ٣ - ٥ أ�?راد للورقة أو الثمرة، وللوصول إلي ك�?اءة مرت�?عة للمركبات المستخدمة، لابد من التطبيق الصحيح، واستخدام ألة الرش المناسبة، وضرورة التغطية الكاملة لسطحي الأوراق المعاملة، وتناوب أستخدام المبيدات، والبداية بمبيد
-                    </p>
+                echo '<div class="col-sm-7 prod_info ">
+                    <h4 class=""></h4>
+                    <p class="well">' . $productData["name"] . '</p>
+                    <div class="qr_">
+                        <img src="../Resources/QRimages/'.$id.'.png" />
+                    </div>    
                 </div>';
+                echo '
                 
+                ';
                 ?>
 
             </div>
@@ -31,52 +51,73 @@
         </div>
         <div id="structure" class="tab-pane fade">
             <?php
-                echo '<ul class="well struc_">
-                <li>' . $Admin_Product["effective_material"] . ':</li>
+            echo '<ul class="well struc_">
+                <li>' . $Admin_Product["active_ingredient"] . ':</li>
                 <p class="">
-                    Ut enim ad minim veniam, Ut enim ad minim veniam.  
+                    ' . $productData['active_ingredient'] . '  
                 </p>
 
-                <li>' . $Admin_Product["chemical_group"] . ':</li>
+                <li>' . $Admin_Product["properties"] . ':</li>
+                    ' . $productData['properties'] . '
                 <p>
-                    Ut enim ad minim veniam, Ut enim ad minim veniam,<br>
-                    Ut enim ad minim veniam,Ut enim ad minim veniam.    
+                        
                 </p>
-                <li>' . $Admin_Product["chemical_increase"] . ':</li>
+                <li>' . $Admin_Product["features"] . ':</li>
                 <p>
-                    Ut enim ad minim veniam, Ut enim ad minim veniam,
-                    Ut enim ad minim veniam,Ut enim ad minim veniam,Ut enim ad minim veniam,
-                    Ut enim ad minim veniam, Ut enim ad minim veniam, Ut enim ad minim veniam.<br>
-                    Ut enim ad minim veniam,Ut enim ad minim veniam.   
+                      ' . $productData['features'] . '
                 </p>
             </ul>';
             ?>
-
         </div>
         <div id="usingWay" class="tab-pane fade">
             <ul class="well struc_">
-                <?php
-                    echo '<li>' . $Admin_Product["how_to_use"] . ':</li>
-                <p class="">
-                يوصي باستخدام المبيد الأكاروسي كونكور وقائياً عند بداية ظهور الإصابة 
-                </p>
-                <li>' . $Admin_Product["explanation_video"] . ':</li>';
-                ?>
+
                 <div class="ex_video">
-                    <iframe src="https://www.youtube.com/embed/tgbNymZ7vqY">
+                    <?php
+                    echo'<iframe src="https://www.youtube.com/embed/' . $productData['video'] . '">';
+                    ?>
+                    <iframe src="https://www.youtube.com/embed/">
                     </iframe>
                 </div>
             </ul>
         </div>
         <div id="advantages" class="tab-pane fade">
-            <ul class="well advan_">
-                <li> Ut enim ad minim veniam, Ut enim ad minim.</li>
-                <li> Ut enim ad minim veniam, Ut enim ad minim.</li>
-                <li> Ut enim ad minim veniam, Ut enim ad minim.</li>
-                <li> Ut enim ad minim veniam, Ut enim ad minim.</li>
-                <li> Ut enim ad minim veniam, Ut enim ad minim.</li>
-                <li> Ut enim ad minim veniam, Ut enim ad minim.</li>
-            </ul>
+            <div class="container-fluid" style="overflow-x: auto">
+                <table id="prodTable" class="prod_table">
+                    <tr>
+                        <?php
+                        echo '
+                
+                <th>' . $ProductInfo["crops"] . '</th>
+                <th>' . $ProductInfo["controlled_pest"] . '</th>
+                <th>' . $ProductInfo["rate_of_use"] . '</th>
+                <th>' . $ProductInfo["phi"] . '</th>'
+                        ;
+                        ?>
+                    </tr>
+
+                    <?php
+                    foreach ($rateData as $rate) {
+
+
+                        echo '<tr>
+                                    <td>
+                                        ' . $rate['crops'] . '
+                                    </td>
+                                    <td>
+                                       ' . $rate['controlled_pest'] . '
+                                    </td>
+                                    <td>
+                                        ' . $rate['rate_of_use'] . '
+                                    </td>
+                                    <td>
+                                       ' . $rate['phi'] . '
+                                    </td>
+                                </tr>';
+                    }
+                    ?>
+                </table>
+            </div>
         </div>
 
     </div>

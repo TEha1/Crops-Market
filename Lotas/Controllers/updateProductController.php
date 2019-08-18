@@ -1,90 +1,88 @@
 <?php
-
-if (!isset($_SESSION)) {
-    session_start();
-}
-if ($_POST['submit'] == 'UpdateProduct' && isset($_SESSION['admin'])) {
+if (!isset($_SESSION)) {session_start();}
+if (isset($_POST['updateProduct'])&& isset($_SESSION['admin'])) {
     try {
         include '../Models/productClass.php';
         $product = new Product();
+        $id = filter_var($_POST['id'] , FILTER_SANITIZE_NUMBER_INT );
         if ($_POST['name'] != '') {
-            $product->updateproduct($_POST['id'], 'name', $_POST['name']);
+            $product->updateProduct($id, 'name', filter_var($_POST['name'],FILTER_SANITIZE_STRING));
         }
         if ($_POST['name_ar'] != '') {
-            $product->updateproduct($_POST['id'], 'name_ar', $_POST['name_ar']);
+            $product->updateProduct($id, 'name_ar', filter_var($_POST['name_ar']),FILTER_SANITIZE_STRING);
         }
         if ($_POST['active_ingredient_ar'] != '') {
-            $product->updateproduct($_POST['id'], 'active_ingredient_ar', $_POST['active_ingredient_ar']);
+            $product->updateProduct($id, 'active_ingredient_ar', filter_var($_POST['active_ingredient_ar'],FILTER_SANITIZE_STRING));
         }
         if ($_POST['properties_ar'] != '') {
-            $product->updateproduct($_POST['id'], 'properties_ar', $_POST['properties_ar']);
+            $product->updateProduct($id, 'properties_ar', filter_var($_POST['properties_ar'],FILTER_SANITIZE_STRING));
         }
         if ($_POST['features_ar'] != '') {
-            $product->updateproduct($_POST['id'], 'features_ar', $_POST['features_ar']);
+            $product->updateProduct($id, 'features_ar',filter_var( $_POST['features_ar'],FILTER_SANITIZE_STRING));
         }
         if ($_POST['active_ingredient'] != '') {
-            $product->updateproduct($_POST['id'], 'active_ingredient', $_POST['active_ingredient']);
+            $product->updateProduct($id, 'active_ingredient',filter_var( $_POST['active_ingredient'],FILTER_SANITIZE_STRING));
         }
         if ($_POST['properties'] != '') {
-            $product->updateproduct($_POST['id'], 'properties', $_POST['properties']);
+            $product->updateProduct($id, 'properties', filter_var($_POST['properties'],FILTER_SANITIZE_STRING));
         }
         if ($_POST['features'] != '') {
-            $product->updateproduct($_POST['id'], 'features', $_POST['features']);
-        }
-        if ($_POST['image'] != '') {
-            $product->updateproduct($_POST['id'], 'image', $_POST['image']);
+            $product->updateProduct($id, 'features',filter_var( $_POST['features'],FILTER_SANITIZE_STRING));
         }
         if ($_POST['video'] != '') {
-            $product->updateproduct($_POST['id'], 'video', $_POST['video']);
+            $product->updateProduct($id, 'video', filter_var($_POST['video'],FILTER_SANITIZE_STRING));
         }
         if ($_POST['category'] != '') {
-            $product->updateproduct($_POST['id'], 'category', $_POST['category']);
+            $product->updateProduct($id, 'category', filter_var($_POST['category'],FILTER_SANITIZE_NUMBER_INT));
         }
         if (isset($_FILES) && !empty($_FILES['image']['name'])) {
-            //get the old image director and delete it
-            $image = $product->selectPeoduct($_POST['id'], 'image');
-            $imageDir = '../Resources/ProductImages/' . $image[0]['image'];
+            $image = $product->selectProduct($id, 'image');
+            $imageDir = '../Resources/ProductImages/' . $image['image'];
             include_once '../Models/fileManagerClass.php';
             $fileManager = new fileManger();
             $fileManager->delete($imageDir);
             $allowedext = array('png', 'jpeg', 'jpg', 'gif');
             $file = $_FILES['image'];
             $dir = "../Resources/ProductImages/";
-            //upload the new image and save director in DB
             $diractor = $fileManager->upload($file, $allowedext, $dir);
-            $product->updateproduct($_POST['id'], 'image', $diractor);
+            $product->updateProduct($id, 'image', $diractor);
         }
-        $number = $product->getNumberOfRateOfUse($_POST['id']);
-        for ($i=1; $i< $number; $i++) {
-            if($_POST[$i]['crops'] != '') {
-                $product->updateRateOfUse($_POST[$i]['id'], 'crops', $_POST[$i]['crops']);
+        $number = $product->getNumberOfRate($id);
+        for ( $i = 0 ; $i < $number ; $i++)
+        {
+            $s = ($i*9)+1;
+            $idR = filter_var($_POST[$s],FILTER_SANITIZE_NUMBER_INT);
+            if ($_POST[$s+1] != '') {
+                $product->updateRate($idR,'crops',filter_var($_POST[$s+1],FILTER_SANITIZE_STRING));
+                
             }
-            if($_POST[$i]['controlled_pest'] != '') {
-                $product->updateRateOfUse($_POST[$i]['id'], 'crops', $_POST[$i]['controlled_pest']);
+            if ($_POST[$s+2] != '') {
+                $product->updateRate($idR,'controlled_pest',filter_var($_POST[$s+2],FILTER_SANITIZE_STRING));
             }
-            if($_POST[$i]['rate_of_use'] != '') {
-                $product->updateRateOfUse($_POST[$i]['id'], 'crops', $_POST[$i]['rate_of_use']);
+            if ($_POST[$s+3] != '') {
+                $product->updateRate($idR,'rate_of_use',filter_var($_POST[$s+3],FILTER_SANITIZE_STRING));
             }
-            if($_POST[$i]['phi'] != '') {
-                $product->updateRateOfUse($_POST[$i]['id'], 'crops', $_POST[$i]['phi']);
+            if ($_POST[$s+4] != '') {
+                $product->updateRate($idR,'phi',filter_var($_POST[$s+4],FILTER_SANITIZE_STRING));
             }
-            if($_POST[$i]['crops_ar'] != '') {
-                $product->updateRateOfUse($_POST[$i]['id'], 'crops', $_POST[$i]['crops_ar']);
+            if ($_POST[$s+5] != '') {
+                $product->updateRate($idR,'crops_ar',filter_var($_POST[$s+5],FILTER_SANITIZE_STRING));
             }
-            if($_POST[$i]['controlled_pest_ar'] != '') {
-                $product->updateRateOfUse($_POST[$i]['id'], 'crops', $_POST[$i]['controlled_pest_ar']);
+            if ($_POST[$s+6] != '') {
+                $product->updateRate($idR,'controlled_pest_ar',filter_var($_POST[$s+6],FILTER_SANITIZE_STRING));
             }
-            if($_POST[$i]['rate_of_use_ar'] != '') {
-                $product->updateRateOfUse($_POST[$i]['id'], 'crops', $_POST[$i]['rate_of_use_ar']);
+            if ($_POST[$s+7] != '') {
+                $product->updateRate($idR,'rate_of_use_ar',filter_var($_POST[$s+7],FILTER_SANITIZE_STRING));
             }
-            if($_POST[$i]['phi_ar'] != '') {
-                $product->updateRateOfUse($_POST[$i]['id'], 'crops', $_POST[$i]['phi_ar']);
+            if ($_POST[$s+8] != '') {
+                $product->updateRate($idR,'phi_ar',filter_var($_POST[$s+8],FILTER_SANITIZE_STRING));
             }
         }
         header('Location: ' . filter_var('../Veiw/ProductInfo.php?id=' . $_POST['id'], FILTER_SANITIZE_URL));
     } catch (Exception $ex) {
         //someting wrong find an idea
-        echo $ex->getMessage();
+        //echo $ex->getMessage();
+        header('Location: ' . filter_var('../Veiw/home.php?notify=wrong_in_system', FILTER_SANITIZE_URL));
     }
 } else {
     //someone go direct to this page and route to home

@@ -1,7 +1,7 @@
+@import url(https://fonts.googleapis.com/css?family=Cairo);
 
-@import url(http://fonts.googleapis.com/earlyaccess/droidarabickufi.css);
 body{
-    font-family: "Droid Arabic Kufi", serif;
+    font-family: 'Cairo', sans-serif;
     color: #818181;
 }
 a:hover {
@@ -34,9 +34,6 @@ a.navbar-brand {
 }
 .navbar-header.navbar-right {
     margin-right: 10px;
-}
-.navbar-right {
-    padding: 10px
 }
 .icon_bar_ {
     background-color: darkgreen
@@ -320,6 +317,37 @@ table {
     }   
 }
 
+@media screen and (min-width: 1024px) {
+    .product_img {
+        height: 200px
+    }
+    .product_img img {
+        width: 100%;
+        height: 100%;
+        margin: auto
+    }
+}
+    
+@media screen and (min-width: 1224px) {
+    .product_img {
+        height: 300px
+    }
+    .product_img img {
+        width: 100%;
+        height: 100%;
+        margin: auto
+    }
+}
+@media screen and (min-width: 1824px) {
+    .product_img {
+        height: 400px
+    }
+    .product_img img {
+        width: 100%;
+        height: 100%;
+        margin: auto
+    }
+}
 /* Products */
 
 
@@ -349,6 +377,9 @@ table {
     border-color: #04040426;
     padding-left: 5px;
 }
+.myOrders_ form div {
+    float: right
+}
 .myOrders_ form input {
     border-radius: 5px;
     border: 2px solid;
@@ -357,9 +388,11 @@ table {
     padding-right: 5px;
     margin-left: 5px;
     margin-right: 5px;
+    height : 35px;
 }
 .edit_profile_data {
-    margin-right: 10px
+    margin-right: 10px;
+    margin-left: 10px;
 }
 .delete_order {
     margin-bottom: 5px
@@ -369,6 +402,33 @@ table {
 }
 .edit_profile_data_submit {
     width: 100%
+}
+@media screen and (max-width: 768px) {
+    .profile_img {
+        height: 400px
+    }
+    .profile_img img {
+        width: 80%;
+        height: 98%
+    }
+}
+@media screen and (max-width: 450px) {
+    .profile_img {
+        height: 300px
+    }
+    .profile_img img {
+        width: 80%;
+        height: 98%
+    }
+}
+@media screen and (max-width: 320px) {
+    .profile_img {
+        height: 200px
+    }
+    .profile_img img {
+        width: 80%;
+        height: 98%
+    }
 }
 /* My Profile */
 
@@ -393,7 +453,11 @@ table {
 }
 .prod_img img {
     max-width: -webkit-fill-available;
+    max-width: -moz-available;
+    max-width: fill-available;
     max-height: -webkit-fill-available;
+    max-height: -moz-available;
+    max-height: fill-available;
     margin: auto
 }
 .prod_info h4 {
@@ -402,12 +466,26 @@ table {
 .prod_info span {
     color: green
 }
+.qr_ {
+    width: 300px;
+    text-align: center;
+}
+.qr_ img{
+    width: 100%;
+    height: 100%;
+}
 .struc_{
     list-style: none
 }
 .struc_ li {
     color: green;
     margin-bottom: 9px;
+}
+
+.admin_prod_img img {
+    max-width: -webkit-fill-available;
+    max-width: -moz-available;
+    max-width: fill-available;
 }
 .struc_ p {
     margin-bottom: 22px
@@ -466,6 +544,18 @@ table {
 /* Orders Aand Users */
 
 /*Admin Add Product*/
+.traverse_en {
+    direction: ltr;
+}
+.traverse_ar {
+    direction: rtl
+}
+.tab-content {
+    margin: 5px;
+}
+.edit__ {
+    margin: -1px
+}
 .admin_prod_img {
 
     text-align: center;
@@ -517,9 +607,63 @@ table {
     width: 100%;
     text-align: center;
 }
-
 .done {
     width: 80%;
+    margin-top: 5px;
+}
+
+.prod_table {
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.prod_table th,
+.prod_table td {
+    padding: 6px 15px;
+}
+.prod_table th {
+    background: #6cc16c;
+    color: #fff;
+    text-align: center;
+}
+.prod_table tr:first-child th:first-child {
+    border-top-right-radius: 6px;
+}
+.prod_table tr:first-child th:last-child {
+    border-top-left-radius: 6px;
+}
+.prod_table td {
+    border-right: 1px solid #c6c9cc;
+    border-bottom: 1px solid #c6c9cc;
+}
+.prod_table td:first-child {
+    border-left: 1px solid #c6c9cc;
+}
+.prod_table tr:nth-child(even) td {
+    background: #eaeaed;
+}
+.prod_table tr:last-child td:first-child {
+    border-bottom-right-radius: 6px;
+}
+.prod_table tr:last-child td:last-child {
+    border-bottom-left-radius: 6px;
+}
+.hide {
+    display: none;
+}
+.done_container_ {
+    margin-top: 10px
+}
+@media screen and (max-width: 750px) {
+    .prod_table textarea.well {
+        width: 130px
+    }
+} 
+@media screen and (max-width: 375px) {
+    .prod_table textarea.well {
+        width: 100px
+    }
 }
 
 /*Admin Add Product*/

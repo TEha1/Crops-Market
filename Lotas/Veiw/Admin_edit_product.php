@@ -2,7 +2,16 @@
 if (!isset($_SESSION)) {
     session_start();
 }
-if (!isset($_SESSION['admin'])) {
+if (isset($_SESSION['admin']) && $_GET["id"]) {
+    $id = $_GET["id"];
+    include '../Models/productClass.php';
+    $product = new Product();
+    $result = $product->checkProductId($id);
+    if($result) {
+        header('Location: ' . filter_var('../Veiw/home.php', FILTER_SANITIZE_URL));
+    }
+    $productData = $product->getProduct($id);
+} else {
     header('Location: ' . filter_var('../Veiw/home.php', FILTER_SANITIZE_URL));
 }
 include './NavBar.php';
@@ -10,109 +19,110 @@ include './NavBar.php';
 
 <div class="container-fluid myNavTabs">
 
-    <form action="" method="POST" enctype="multipart/form-data" >
+    <form action="../Controllers/updateProductController.php" method="POST" enctype="multipart/form-data">
         <ul class="nav nav-tabs nav-justified">
             <?php
-                echo '<li class="active"><a href="#defention" data-toggle="pill">' . $Admin_Product["definition"] . '</a></li>
+            echo '<li class="active"><a href="#defention" data-toggle="pill">' . $Admin_Product["definition"] . '</a></li>
                 <li><a href="#structure" data-toggle="pill">' . $Admin_Product["structure"] . '</a></li>
                 <li><a href="#usingWay" data-toggle="pill">' . $Admin_Product["using_way"] . '</a></li>
-                <li><a href="#advantages" data-toggle="pill">' . $Admin_Product["advantages"] . '</a></li>';
+                <li><a href="#advantages" data-toggle="pill">' . $Admin_Product["rate_of_use"] . '</a></li>';
             ?>
         </ul>
         <div class="tab-content">
+        <input name="id" style="display:none" value="<?php echo $id ?>">
             <div id="defention" class="tab-pane fade in active">
-
-                <a class="btn btn-primary english_defenition_btn">En</a>
+                <a class="btn btn-primary english_defenition_btn ">En</a>
                 <hr>
-                <div class="row english_defenition" style="display: none">
+                <div class="row english_defenition traverse_en" style="display: none">
                     <div class="col-sm-5 well" >
 
                         <div class=" admin_prod_img">
-                            <img src="../Resources/IMG/prod_01.jpg">
+                        <?php echo '<img src="../Resources/ProductImages/'.$productData["image"].'">'?>
+                            
                         </div>
                         <div class="text-center upload_form" >
                             <input type="file" name="image">
                         </div><br>
                         <div class="form-group">
                             <span >Select Category :</span><br>
-                            <select name="gender" class="gender" required style="width: 50%; height: 35px; border-radius: 5px">
-                                <option value="">G1</option>
-                                <option value="">G2</option>
-                                <option value="">G3</option>
-                                <option value="">G4</option>
-                                <option value="">G5</option>
-                                <option value="">G6</option>
+                            <select name="category" class="deletecategory_submit">
+                            <option value=""> </option>
+                            <?php
+                            include_once '../Models/categoryClass.php';
+                            $category = new Category();
+                            $data = $category->getAllCategories();
+                            foreach ($data as $cat) {
+                                if($cat['id'] == $productData['category'])
+                                {
+                                    echo '<option disabled value="' . $cat['id'] . '">' . $cat['name'] . '</option>';
+                                }
+                                else
+                                {
+                                    echo '<option value="' . $cat['id'] . '">' . $cat['name'] . '</option>';
+                                }
+                                
+                            }
+                            ?>
                             </select>
                         </div>
 
                     </div>
                     <div class="col-sm-7 prod_info ">
-                        <h4 class="">Name:</h4>
-                        <input class="well header_test" type="text" name="prod_name" placeholder="TRON-PH">
-                        <h4 class="">Definition:</h4>
-                        <div class="new_definition well text-center">
-                            <textarea class="well" maxlength="545" placeholder="Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi."></textarea>
-                        </div>
+                        <?php
+                        echo '<h4 class="">' . $English["product_name"] . ':</h4>
+                        <input id="productNameEdit" class="well header_test" type="text" name="name" placeholder="'.$productData["name"].'">
+                        <b id="notMatechedEdit_1" class="not_matched">not matched</b>
+                        ';
+                        ?>
                     </div>
                 </div>
 
-                <a class="btn btn-primary arabic_defenition_btn">Ar</a>
+                <a class="btn btn-primary arabic_defenition_btn ">Ar</a>
                 <hr>
-                <div class=" arabic_defenition">
+                <div class=" arabic_defenition traverse_ar">
 
                     <div class=" prod_info ">
                         <?php
-                        echo '<h4 class="">' . $Admin_Product["product_name"] . ':</h4>
-                        <input class="well header_test" type="text" name="prod_name" placeholder="ØªØ±ÙˆÙ†">
+                        echo '<h4 class="">' . $Arabic["product_name"] . ':</h4>
+                        <input id="productNameEditAr" class="well header_test" type="text" name="name_ar" placeholder="'.$productData["name_ar"].'">
+                        <b id="notMatechedEdit_2" class="not_matched">not matched</b>
+                        ';
                         
-                        <div class = "form-group">
-                            <span>' . $Admin_Product["select_category"] . ':</span><br>
-                            <select name = "category" class = "" required style = "width: 50%; height: 35px; border-radius: 5px;">';
-                        include_once "../Models/categoryClass.php";
-                        $category = new Category();
-                        $data = $category->getAllCategories();
-                        foreach ($data as $cat) {
-                            echo '<option value = "' . $cat['id'] . '">' . $cat['name_en'] . '</option > ';
-                        }
-                        echo '</select>
-                        </div>
-                        <h4 class = "">' . $Admin_Product["definition"] . ':</h4>
-                        <div class="new_definition well text-center">
-                            <textarea class="well" maxlength="545" placeholder=""></textarea>
-                        </div>
-                    </div>';
                         ?>
                     </div>
 
                 </div>
-
+        </div>
                 <div id="structure" class="tab-pane fade product_struct well">
-                    <a class="btn btn-primary english_structure_btn">En</a>
+                    <a class="btn btn-primary english_structure_btn ">En</a>
                     <hr>
-                    <ul class="struc_ english_structure">
-                        <li>Effective Material:</li>
-                        <textarea class="well" maxlength="545" placeholder="Ut enim ad minim veniam, Ut enim ad minim veniam."></textarea>
+                    <ul class="struc_ english_structure traverse_en">
+                        <?php
+                        echo '
+                        
+                        <li>' . $English["active_ingredient"] . ':</li>
+                        <textarea class="well" maxlength="545" name="active_ingredient" placeholder="'.$productData["active_ingredient"].'"></textarea>
 
-                        <li>Chemical Group:</li>
-                        <textarea class="well" maxlength="545" placeholder="Ut enim ad minim veniam, Ut enim ad minim veniam,
-                                  Ut enim ad minim veniam,Ut enim ad minim veniam."></textarea>
+                        <li>' . $English["properties"] . ':</li>
+                        <textarea class="well" maxlength="545" name="properties" placeholder="'.$productData["properties"].'"></textarea>
 
-                        <li>Chemical Group:</li>
-                        <textarea class="well" maxlength="545" placeholder="Ut enim ad minim veniam, Ut enim ad minim veniam, Ut enim ad minim veniam,Ut enim ad minim veniam,Ut enim ad minim veniam, Ut enim ad minim veniam, Ut enim ad minim veniam, Ut enim ad minim veniam.
-                                  Ut enim ad minim veniam,Ut enim ad minim veniam."></textarea>
+                        <li>' . $English["features"] . ':</li>
+                        <textarea class="well" maxlength="545" name="features" placeholder="'.$productData["features"].'"></textarea>
+                        ';
+                        ?>
                     </ul>
-                    <a class="btn btn-primary arabic_structure_btn">Ar</a>
+                    <a class="btn btn-primary arabic_structure_btn ">Ar</a>
                     <hr>
                     <?php
-                    echo '<ul class="struc_ arabic_structure">
-                        <li>' . $Admin_Product["effective_material"] . ':</li>
-                        <textarea class="well" maxlength="545" placeholder="Ut enim ad minim veniam, Ut enim ad minim veniam."></textarea>
+                    echo '<ul class="struc_ arabic_structure traverse_ar">
+                        <li>' . $Arabic["active_ingredient"] . ':</li>
+                        <textarea class="well" maxlength="545" name="active_ingredient_ar" placeholder="'.$productData["active_ingredient_ar"].'"placeholder=""></textarea>
 
-                        <li>' . $Admin_Product["chemical_group"] . ':</li>
-                        <textarea class="well" maxlength="545" placeholder="Ut enim ad minim veniam, Ut enim ad minim veniam, Ut enim ad minim veniam,Ut enim ad minim veniam."></textarea>
+                        <li>' . $Arabic["properties"] . ':</li>
+                        <textarea class="well" maxlength="545"  name="properties_ar" placeholder="'.$productData["properties_ar"].'"></textarea>
 
-                        <li>' . $Admin_Product["chemical_increase"] . ':</li>
-                        <textarea class="well" maxlength="545" placeholder="Ut enim ad minim veniam, veniam, Ut enim ad minim veniam, Ut enim ad minim veniam, Ut enim ad minim veniam. Ut enim ad minim veniam,Ut enim ad minim veniam."></textarea>
+                        <li>' . $Arabic["features"] . ':</li>
+                        <textarea class="well" maxlength="545" name="features_ar" placeholder="'.$productData["features_ar"].'"></textarea>
                     </ul>';
                     ?>
 
@@ -121,56 +131,138 @@ include './NavBar.php';
                 <div id="usingWay" class="tab-pane fade product_struct well">
 
                     <ul class="well struc_">
-                        <a class="btn btn-primary english_usingway_btn">En</a>
-                        <hr>
-                        <div class="english_usingway">
-                            <li>How to Use:</li>
-                            <textarea class="well" maxlength="545" placeholder="Ut enim ad minim veniam, Ut enim ad minim veniam."></textarea>
-
-                        </div>
-                        <a class="btn btn-primary arabic_usingway_btn">Ar</a>
-                        <hr>
-                        <div class="arabic_usingway">
-                            <?php
-                            echo '<li>' . $Admin_Product["how_to_use"] . ':</li>';
-                            ?>
-                            <textarea class="well" maxlength="545" placeholder="Ut enim ad minim veniam, Ut enim ad minim veniam."></textarea>
-
-                        </div>
-                        <li>Explanation Video URL:</li>
-                        <textarea class="well" maxlength="545" placeholder="https://youtu.be/r3LiyKA4gqs?list=RDMM3dP6pyWe30Y"></textarea>
+                        <?php 
+                        echo '
+                        <li>'.$Admin_Product["explanation_video_id"].':</li>
+                        <textarea class="well" maxlength="545" name="video" placeholder="'.$productData["video"].'"></textarea>
+                        ';
+                        ?>
+                        
                     </ul>
                 </div>
-                <div id="advantages" class="tab-pane fade new_definition well">
-                    <a class="btn btn-primary english_advantages_btn">En</a>
-                    <hr>
-                    <textarea class="well english_advantages " maxlength="545" placeholder="
-                              Ut enim ad minim veniam, Ut enim ad minim.
-                              Ut enim ad minim veniam, Ut enim ad minim.
-                              Ut enim ad minim veniam, Ut enim ad minim.
-                              Ut enim ad minim veniam, Ut enim ad minim.
-                              Ut enim ad minim veniam, Ut enim ad minim.
-                              Ut enim ad minim veniam, Ut enim ad minim."></textarea>
+                <div id="advantages" class="tab-pane fade">
+                    <div class="container-fluid" style="overflow-x: auto">
+                        <table id="prodTable" class="prod_table">
+                            <tr>
+                                <?php
+                                echo '
+                
+                <th>' . $ProductInfo["crops"] . '</th>
+                <th>' . $ProductInfo["controlled_pest"] . '</th>
+                <th>' . $ProductInfo["rate_of_use"] . '</th>
+                <th>' . $ProductInfo["phi"] . '</th>
+                <th> delete </th>'
+                ;
+                                ?>
+                            </tr>
+                            
+                        <?php 
+                        $num=$product->getNumberOfRate($id);
+                        $rateData = $product->selectRate($id);
+                        $i=0;
 
-                    <a class="btn btn-primary arabic_advantages_btn">Ar</a>
-                    <hr>
-                    <textarea class="well arabic_advantages " maxlength="545" placeholder="
-                              Ut enim ad minim veniam, Ut enim ad minim.
-                              Ut enim ad minim veniam, Ut enim ad minim.
-                              Ut enim ad minim veniam, Ut enim ad minim.
-                              Ut enim ad minim veniam, Ut enim ad minim.
-                              Ut enim ad minim veniam, Ut enim ad minim.
-                              Ut enim ad minim veniam, Ut enim ad minim."></textarea>
+                        foreach($rateData as $rate)
+                        {
+                            $s = ($i*9)+1;
+                            echo '<input name="'.($s).'" value="'.$rate['id'].'" style="display: none">';
+                            echo '<tr>
+                                    <td>
+                                        <textarea class="well traverse_en" type="text" name="'.($s+1).'" placeholder="'.$rate['crops'].'" ></textarea><br>
+                                        <textarea class="well traverse_ar"  type="text" name="'. ($s+5) .'" placeholder="'.$rate['crops_ar'].'" ></textarea>
+                                    </td>
+                                    <td>
+                                        <textarea class="well traverse_en" type="text" name="'.($s+2) .'" placeholder="'.$rate['controlled_pest'].'" ></textarea><br>
+                                        <textarea class="well traverse_ar"  type="text" name="'.($s+6) .'" placeholder="'.$rate['controlled_pest_ar'].'" ></textarea>
+                                    </td>
+                                    <td>
+                                        <textarea class="well traverse_en" type="text" name="'.($s+3) .'" placeholder="'.$rate['rate_of_use'].'" ></textarea><br>
+                                        <textarea class="well traverse_ar"  type="text" name="'.($s+7) .'" placeholder="'.$rate['rate_of_use_ar'].'" ></textarea>
+                                    </td>
+                                    <td>
+                                        <textarea class="well traverse_en" type="text" name="'.($s+4) .'" placeholder="'.$rate['phi'].'" ></textarea><br>
+                                        <textarea class="well traverse_ar"  type="text" name="'.($s+8) .'" placeholder="'.$rate['phi_ar'].'" ></textarea>
+                                    </td>
+                                    <td>
+                                        <a href="../Controllers/deleteRateController.php?DeleteRate=1&id='.$rate['id'].'" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+                                    </td>
+                                </tr>';
+                            $i++;
+                        }
+                        
+                        ?>
+                        </table>
+                    </div>
+            <div class="done_container"> 
+                <span class="btn btn-success btn-md" data-toggle="modal" data-target="#addRowModal">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </span>
+            </div>
                 </div>
             </div>
             <div class="done_container">
-                <input type="submit" name="apply" value="Done"
+                <input id="editProduct__" type="submit" name="updateProduct" value="Done"
                        class="btn btn-success btn-md done">
             </div>
-
-    </form>    
+    </form>
+    
 </div>
+
+<div class="modal fade" id="addRowModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form action="../Controllers/addRateController.php" method="POST">
+
+                <div class="container-fluid" style="overflow-x: auto">
+                    <table class="prod_table">
+                    <tr>
+                    <?php
+                    echo '
+                    <th>' . $ProductInfo["crops"] . '</th>
+                    <th>' . $ProductInfo["controlled_pest"] . '</th>
+                    <th>' . $ProductInfo["rate_of_use"] . '</th>
+                    <th>' . $ProductInfo["phi"] . '</th>'
+                    ;
+                    ?>
+                    </tr>
+                <tr>
+                                <td>
+                                    <textarea class="well traverse_en" type="text" name="crops" placeholder="Crops" required></textarea><br>
+                                    <textarea class="well traverse_ar"  type="text" name="crops_ar" placeholder="المحاصيل الزراعيه" required></textarea>
+                                </td>
+                                <td>
+                                    <textarea class="well traverse_en" type="text" name="controlled_pest" placeholder="Controlled Pest" required></textarea><br>
+                                    <textarea class="well traverse_ar"  type="text" name="controlled_pest_ar" placeholder="الحشرات المكافحه" required></textarea>
+                                </td>
+                                <td>
+                                    <textarea class="well traverse_en" type="text" name="rate_of_use" placeholder="Rate Of Use" required></textarea><br>
+                                    <textarea class="well traverse_ar"  type="text" name="rate_of_use_ar" placeholder="نسبه الاستعمال" required></textarea>
+                                </td>
+                                <td>
+                                    <textarea class="well traverse_en" type="text" name="phi" placeholder="PHI" required></textarea><br>
+                                    <textarea class="well traverse_ar"  type="text" name="phi_ar" placeholder="نسبه الامان" required></textarea>
+                                </td>
+                                <input name="product_id" style="display:none" value="<?php echo $id; ?>"> 
+                    </tr>
+                    </table>
+                    </div>
+                    <div class="done_container">
+                        <input id="editProduct__" type="submit" name="addNewRow" value="Add"
+                            class="btn btn-success btn-md done">
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="../Resources/JS/add_prod.js"></script>
+<script src="../Resources/JS/editProduct.js"></script>
 
 <?php
 include './footer.php';

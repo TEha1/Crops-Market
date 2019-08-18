@@ -12,8 +12,8 @@ quantity_.onkeyup = function(){
 */
 //////////////////////////////////////
 var price_div = document.getElementById("price_div");
-var d = price_div.children.length-2;
-for (var x=1; x<3; x++)
+var d = price_div.children.length-1;
+for (var x=1; x<d; x++)
 {
     test_(x);
     //console.log("Q " + x + " = " + price_.textContent);

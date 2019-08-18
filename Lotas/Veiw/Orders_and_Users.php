@@ -44,25 +44,18 @@ include 'NavBar.php';
                 <li class="active"><a href="#orders" data-toggle="pill">' . $Orders["current_orders"] . '</a></li>
                 <li><a href="#users"  data-toggle="pill">' . $Orders["current_users"] . '</a></li>
             </ul><br>
-            <div class="input-group">
-                <input type="text" class="form-control" placeholder="' . $Orders["search"] . '">
-                <span class="input-group-btn">
-                    <button class="btn btn-default" type="button">
-                        <span class="glyphicon glyphicon-search"></span>
-                    </button>
-                </span>
-            </div>
+             
         </div>';
         ?>
 
-        <div class="col-sm-9 tab-content">
+        <div class="col-sm-9 tab-content edit__">
             <div id="orders" class="list-group tab-pane fade in active">
                 <?php
                 foreach ($Orderdata as $value) {
 
                 $productData = $product->getProduct($value['product']);
                 echo '<span class="list-group-item products_" style="overflow: hidden">
-                    ' . $productData[0]["name"] . '
+                    ' . $productData["name"] . '
                     <a href="../Controllers/deleteOrderController.php?id=' . $value["id"] . '" id="" class="btn btn-danger delete_order delete_order_" role="button" >
                         <i class="glyphicon glyphicon-trash"></i>
                     </a>
@@ -132,7 +125,7 @@ include 'NavBar.php';
                                 <a class="btn btn-danger delete_user delete_user_" role="button">
                                     <i class="glyphicon glyphicon-trash"></i>
                                 </a>
-                                <a href="../Controllers/blockUserController.php?submit=block&id=' . $value["id"] . '" class="order_info order_info_ btn btn-' . $btn . '" role="button">
+                                <a href="../Controllers/blockUserController.php?block=1&id=' . $value["id"] . '" class="order_info order_info_ btn btn-' . $btn . '" role="button">
                                     <i class="glyphicon glyphicon-ban-circle"></i>
                                 </a>
                             </span>';
@@ -204,7 +197,7 @@ include 'NavBar.php';
                                     <hr>
                                     <span class="order_dialog">' . $Orders["order_full_price"] . ' : </span><span> 5000 ' . $Orders["egp"] . '</span><br>
                                     <hr>
-                                    <span class="order_dialog">' . $Orders["ordered_by"] . ' : </span><a href="" class="" data-dismiss="modal" data-toggle="modal" data-target="#'.$userData[0]["id"].'user"> ' . $userData[0]["first_name"] . ' ' . $userData[0]["last_name"] . '</a>
+                                    <span class="order_dialog">' . $Orders["ordered_by"] . ' : </span><a href="" class="" data-dismiss="modal" data-toggle="modal" data-target="#'.$userData["id"].'user"> ' . $userData["first_name"] . ' ' . $userData["last_name"] . '</a>
                                 </div>
                             </div>
                         </div>

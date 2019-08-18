@@ -5,13 +5,20 @@ include_once 'DB.php';
 */
 class User 
 {
-    /*
-	**function check if user is sorted in db or not and if sorted update his info
-	**$code-> get form google api
-    **$gClient->get from google api
-    **$google_oauthV2->get from google api
-    */
-	private $userTbl = 'users';
+    private $id ='id';
+    private $oauth_provider ='oauth_provider';
+    private $oauth_uid ='oauth_uid';
+    private $first_name ='first_name';
+    private $last_name ='last_name';
+    private $email ='email';
+    private $gender ='gender';
+    private $picture ='picture';
+    private $link ='link';
+    private $phone ='phone';
+    private $password ='password';
+    private $block ='block';
+    private $users ='users';
+    
     public function GoogleLogin($code,$gClient,$google_oauthV2)
 	{
 		$db = new DB();
@@ -26,71 +33,58 @@ class User
             'first_name'    => $gpUserProfile['given_name'],
             'last_name'     => $gpUserProfile['family_name'],
             'email'         => $gpUserProfile['email'],
-            'gender'        => $gpUserProfile['gender'],
+            'gender'        => '',
             'picture'       => $gpUserProfile['picture'],
-            'link'          => $gpUserProfile['link']
+            'link'          => ''
         );
-		if(!empty($gpUserData)){
-            //Check whether user data already exists in database
-            $querySelect = "SELECT
-                                * 
-                            FROM 
-                                ".$this->userTbl." 
+        $querySelect = "SELECT
+                            * 
+                        FROM 
+                            ".$this->users." 
+                        WHERE 
+                            oauth_provider = '".$gpUserData['oauth_provider']."' 
+                        AND
+                            oauth_uid = '".$gpUserData['oauth_uid']."'";
+        $result = $db->prepare($querySelect);
+        $result->execute();
+        if($result->rowCount() > 0){
+            $queryUpdate = "UPDATE 
+                                ".$this->users." 
+                            SET 
+                                $this->first_name = '".$gpUserData['first_name']."', 
+                                $this->last_name = '".$gpUserData['last_name']."', 
+                                $this->email = '".$gpUserData['email']."', 
+                                $this->gender = '".$gpUserData['gender']."',
+                                $this->picture = '".$gpUserData['picture']."', 
+                                $this->link = '".$gpUserData['link']."' 
                             WHERE 
-                                oauth_provider = '".$gpUserData['oauth_provider']."' 
-                            AND
-                                oauth_uid = '".$gpUserData['oauth_uid']."'";
-            $result = $db->prepare($querySelect);
-        	$result->execute();
-            if($result->rowCount() > 0){
-                //Update user data if already exists
-                $queryUpdate = "UPDATE 
-                                    ".$this->userTbl." 
-                                SET 
-                                    first_name = '".$gpUserData['first_name']."', 
-                                    last_name = '".$gpUserData['last_name']."', 
-                                    email = '".$gpUserData['email']."', 
-                                    gender = '".$gpUserData['gender']."',
-                                    picture = '".$gpUserData['picture']."', 
-                                    link = '".$gpUserData['link']."' 
-                                WHERE 
-                                    oauth_provider = '".$gpUserData['oauth_provider']."' 
-                                AND 
-                                    oauth_uid = '".$gpUserData['oauth_uid']."'";
-                $update = $db->prepare($queryUpdate);
-        		$update->execute();
-            }else{
-                //Insert user data
-                $queryInsert = "INSERT INTO 
-                                    ".$this->userTbl." 
-                                SET 
-                                    oauth_provider = '".$gpUserData['oauth_provider']."', 
-                                    oauth_uid = '".$gpUserData['oauth_uid']."', 
-                                    first_name = '".$gpUserData['first_name']."', 
-                                    last_name = '".$gpUserData['last_name']."',
-                                    email = '".$gpUserData['email']."',
-                                    gender = '".$gpUserData['gender']."', 
-                                    picture = '".$gpUserData['picture']."',
-                                    link = '".$gpUserData['link']."'";
-                $insert = $db->prepare($queryInsert);
-        		$insert->execute();
-            }
-            
-            //Get user data from the database
-            $result = $db->prepare($querySelect);
-        	$result->execute();
-            $gpUserData = $result->fetchAll();
+                                $this->oauth_provider = '".$gpUserData['oauth_provider']."' 
+                            AND 
+                                $this->oauth_uid = '".$gpUserData['oauth_uid']."'";
+            $update = $db->prepare($queryUpdate);
+            $update->execute();
+        }else{
+            $queryInsert = "INSERT INTO 
+                                ".$this->users." 
+                            SET 
+                                $this->oauth_provider = '".$gpUserData['oauth_provider']."', 
+                                $this->oauth_uid = '".$gpUserData['oauth_uid']."', 
+                                $this->first_name = '".$gpUserData['first_name']."', 
+                                $this->last_name = '".$gpUserData['last_name']."',
+                                $this->email = '".$gpUserData['email']."',
+                                $this->gender = '".$gpUserData['gender']."', 
+                                $this->picture = '".$gpUserData['picture']."',
+                                $this->link = '".$gpUserData['link']."'";
+            $insert = $db->prepare($queryInsert);
+            $insert->execute();
         }
-        //close db connection
+        $result = $db->prepare($querySelect);
+        $result->execute();
+        $gpUserData = $result->fetch();
         $db = NULL;
-        //Return user data
         return $gpUserData;
 	}
-    /*
-    **function check if user is sorted in db or not and if sorted update his info
-    **$helper-> get form facebook api
-    **$FB->get form facebook api
-    */
+    
     public function FacebookLogin($helper,$FB)
     {
         $db = new DB();
@@ -108,236 +102,163 @@ class User
             'first_name'    => $userData['first_name'],
             'last_name'     => $userData['last_name'],
             'email'         => $userData['email'],
-            'gender'        => $userData['gender'],
+            'gender'        => '',
             'picture'       => $userData['picture']['url'],
-            'link'          => $userData['link']
+            'link'          => ''
         );
-        if(!empty($gpUserData)){
-            //Check whether user data already exists in database
-            $querySelect = "SELECT 
-                                * 
-                            FROM 
-                                ".$this->userTbl." 
-                            WHERE 
-                                oauth_provider = '".$gpUserData['oauth_provider']."'
-                            AND 
-                                oauth_uid = '".$gpUserData['oauth_uid']."'";
-            $result = $db->prepare($querySelect);
-            $result->execute();
-            if($result->rowCount() > 0){
-                //Update user data if already exists
-                $queryUpdate = "UPDATE 
-                                    ".$this->userTbl." 
-                                SET 
-                                    first_name = '".$gpUserData['first_name']."',
-                                    last_name = '".$gpUserData['last_name']."',
-                                    email = '".$gpUserData['email']."',
-                                    gender = '".$gpUserData['gender']."',
-                                    picture = '".$gpUserData['picture']."', 
-                                    link = '".$gpUserData['link']."' 
-                                WHERE
-                                    oauth_provider = '".$gpUserData['oauth_provider']."' 
-                                AND 
-                                    oauth_uid = '".$gpUserData['oauth_uid']."'";
-                $update = $db->prepare($queryUpdate);
-                $update->execute();
-            }else{
-                //Insert user data
-                $queryInsert = "INSERT INTO 
-                                    ".$this->userTbl."
-                                SET 
-                                    oauth_provider = '".$gpUserData['oauth_provider']."',
-                                    oauth_uid = '".$gpUserData['oauth_uid']."',
-                                    first_name = '".$gpUserData['first_name']."',
-                                    last_name = '".$gpUserData['last_name']."',
-                                    email = '".$gpUserData['email']."',
-                                    gender = '".$gpUserData['gender']."', 
-                                    picture = '".$gpUserData['picture']."', 
-                                    link = '".$gpUserData['link']."'";
-                $insert = $db->prepare($queryInsert);
-                $insert->execute();
-            }
-            
-            //Get user data from the database
-            $result = $db->prepare($querySelect);
-            $result->execute();
-            $gpUserData = $result->fetchAll();
-        }
-        //close db connection
-        $db = NULL;
-        //Return user data
-        return $gpUserData;
-    }
-    /*
-    **function SignUp check  if this mail is exist or not and  if not exist insert it
-    **and if exist return false
-    **$UserData info of user  
-    */
-    public function Check($email)
-    {
-        $db = new DB();
-        //Check whether user data already exists in database
         $querySelect = "SELECT 
                             * 
                         FROM 
-                            ".$this->userTbl." 
-                        WHERE
-                            email = '".$email."'";
+                            ".$this->users." 
+                        WHERE 
+                            $this->oauth_provider = '".$gpUserData['oauth_provider']."'
+                        AND 
+                            $this->oauth_uid = '".$gpUserData['oauth_uid']."'";
         $result = $db->prepare($querySelect);
         $result->execute();
-        if($result->rowCount() > 0)
-        {
-            return false;
+        if($result->rowCount() > 0){
+            $queryUpdate = "UPDATE 
+                                ".$this->users." 
+                            SET 
+                                $this->first_name = '".$gpUserData['first_name']."',
+                                $this->last_name = '".$gpUserData['last_name']."',
+                                $this->email = '".$gpUserData['email']."',
+                                $this->gender = '".$gpUserData['gender']."',
+                                $this->picture = '".$gpUserData['picture']."', 
+                                $this->link = '".$gpUserData['link']."' 
+                            WHERE
+                                $this->oauth_provider = '".$gpUserData['oauth_provider']."' 
+                            AND 
+                                $this->oauth_uid = '".$gpUserData['oauth_uid']."'";
+            $update = $db->prepare($queryUpdate);
+            $update->execute();
+        }else{
+            $queryInsert = "INSERT INTO 
+                                ".$this->users."
+                            SET 
+                                $this->oauth_provider = '".$gpUserData['oauth_provider']."',
+                                $this->oauth_uid = '".$gpUserData['oauth_uid']."',
+                                $this->first_name = '".$gpUserData['first_name']."',
+                                $this->last_name = '".$gpUserData['last_name']."',
+                                $this->email = '".$gpUserData['email']."',
+                                $this->gender = '".$gpUserData['gender']."', 
+                                $this->picture = '".$gpUserData['picture']."', 
+                                $this->link = '".$gpUserData['link']."'";
+            $insert = $db->prepare($queryInsert);
+            $insert->execute();
         }
-        else
-        {
-            return true;
-        }
+        $result = $db->prepare($querySelect);
+        $result->execute();
+        $gpUserData = $result->fetch();
+        $db = NULL;
+        return $gpUserData;
+    }
+    
+    public function Check($email)
+    {
+        $db = new DB();
+        $querySelect = "SELECT 
+                            $this->id 
+                        FROM 
+                            ".$this->users." 
+                        WHERE
+                            $this->email = '".$email."'";
+        $result = $db->prepare($querySelect);
+        $result->execute();
+        $db=NULL;
+        if($result->rowCount() > 0){return false;}else{return true;}
 
     }
+    
     public function SignUp($UserData) 
     {
         $db = new DB();
-        if(!empty($UserData))
-        {
-            //Insert user data
-            $queryInsert = "INSERT INTO
-                                ".$this->userTbl."
-                            SET 
-                                oauth_provider = '".$UserData['oauth_provider']."',
-                                first_name = '".$UserData['first_name']."',
-                                last_name = '".$UserData['last_name']."',
-                                email = '".$UserData['email']."',
-                                gender = '".$UserData['gender']."',
-                                password = '".$UserData['password']."',
-                                picture = '".$UserData['picture']."'";
-            $querySelect = "SELECT 
+        $queryInsert = "INSERT INTO
+                            ".$this->users."
+                        SET 
+                            $this->oauth_provider   = '".$UserData['oauth_provider']."',
+                            $this->first_name       = '".$UserData['first_name']."',
+                            $this->last_name        = '".$UserData['last_name']."',
+                            $this->email            = '".$UserData['email']."',
+                            $this->gender           = '".$UserData['gender']."',
+                            $this->password         = '".$UserData['password']."',
+                            $this->phone            = '".$UserData['phone']."',
+                            $this->picture          = '".$UserData['picture']."'";
+        $querySelect = "SELECT 
                             * 
                         FROM 
-                            ".$this->userTbl." 
+                            ".$this->users." 
                         WHERE
-                            email = '".$UserData['email']."'";
-            $insert = $db->prepare($queryInsert);
-            $insert->execute();
-            //Get user data from the database
-            $result = $db->prepare($querySelect);
-            $result->execute();
-            $UserData = $result->fetchAll();
-            return $UserData;
-        }
-        return false;
+                            $this->email = '".$UserData['email']."'";
+        $insert = $db->prepare($queryInsert);
+        $insert->execute();
+        $result = $db->prepare($querySelect);
+        $result->execute();
+        $UserData = $result->fetch();
+        $db=NULL;
+        return $UserData;
     }
-    /*
-    **function LogIn check if this email exist in database or not and if exist return his info
-    **and if not exist return false
-    **$UserData is an array with his email
-    */
+    
     public function LogIn($UserData)
     {
         $db = new DB();
-        if(!empty($UserData))
-        {
-            //Check whether user data already exists in database
-            $querySelect = "SELECT
-                                * 
-                            FROM 
-                                ".$this->userTbl."
-                            WHERE 
-                                email = '".$UserData['email']."'";
-            $result = $db->prepare($querySelect);
-            $result->execute();
-            if($result->rowCount() > 0)
-            {
-                $data = $result->fetchAll();
-                return $data;   
-            }
-            else
-            {
-                return false;
-            }
-        }
-        return false;
+        $querySelect = "SELECT
+                            * 
+                        FROM 
+                            ".$this->users."
+                        WHERE 
+                            $this->email = '".$UserData['email']."'";
+        $result = $db->prepare($querySelect);
+        $result->execute();
+        $data = $result->fetch();
+        $db=NULL;
+        if($result->rowCount() > 0){return $data;}else{return false;}
     }
-    /*
-    **funcrion LogOut destroy session
-    */
+    
     public function LogOut()
     {
         session_destroy();
     }
-    /*
-    **update one column in one time 
-    **$id id of user
-    **$col column i want to update
-    **$data data i want to set
-    **if updated reurn true else return false
-    */
-    public function updateuser($id,$col,$data)
+    
+    public function UpdateUser($id,$col,$data)
     {
         $db = new DB(); 
         $query = "UPDATE 
-                    `".$this->userTbl."`
+                    `".$this->users."`
                 SET 
                     `".$col."` = '".$data."' 
                 WHERE 
-                    `id` = ".$id ;
+                    $this->id = ".$id ;
         $stm = $db->prepare($query);
-        if($stm->execute())
-        {
-            $db = NULL;
-            return TRUE;
-        } 
-        else 
-        {
-            $db = NULL;
-            return false;    
-        }
+        $db = NULL;
+        if($stm->execute()){return TRUE;} else {return false;}
 
     }
-    /*
-    **function delete user delete one user in one time
-    **if you delete user you delete every order he ask
-    **$id is the id of user
-    */
-    public function deleteUser($id)
+    
+    public function DeleteUser($id)
     {
         $db = new DB(); 
-        $query = "DELETE FROM `users` WHERE `id`= ".$id;
+        $query = "DELETE FROM $this->users WHERE $this->id= ".$id;
         $stm = $db->prepare($query);
-        if($stm->execute())
-        {
-            $db = NULL;
-            return TRUE;   
-        } 
-        else 
-        {
-            $db = NULL;
-            return false;    
-        }
+        $db = NULL;
+        if($stm->execute()){return TRUE;} else {return false;}
     }
-    /*
-    **function selectuser used to select specific column in users table
-    **$id id of user
-    **$col column you want to select
-    */
-    public function selectuser($id,$col)
+    
+    public function SelectUser($id,$col)
     {
         $db = new DB();
-        $query = "SELECT ".$col." FROM `users` WHERE `id` =".$id;
+        $query = "SELECT ".$col." FROM $this->users WHERE $this->id =".$id;
         $result = $db->prepare($query);
         $result->execute();
-        $ProductData = $result->fetchAll();
+        $ProductData = $result->fetch();
         $db = NULL;
         return $ProductData;
     }
-    /*
-    **function block used to change column block in user table if 0 to 1 and vice versa
-    **$id the id of user
-    */
-    public function block($id)
+    
+    public function Block($id)
     {
-        $block = $this->selectuser($id,'block');
-        if($block[0]['block'] == 1)
+        $block = $this->SelectUser($id,'block');
+        if($block['block'] == 1)
         {
             $this->updateuser($id,'block',0);
         }
@@ -346,22 +267,18 @@ class User
             $this->updateuser($id,'block',1);
         }
     }
-    /*
-    **function getNumberOfUsers return number of all users
-    */
+    
     public function getNumberOfUsers()
     {
-        $query = "SELECT * FROM `users`";
+        $query = "SELECT COUNT($this->id) as num FROM $this->users";
         $db = new DB();
         $result = $db->prepare($query);
         $result->execute();
-        $data = $result->rowCount();
-        return $data;
+        $data = $result->fetch();
+        $db=NULL;
+        return $data['num'];
     }
-    /*
-    **function GetUsersByLIMIT get 10 rows from users in specific category 
-    **if $pageid = 5 the limet get from 40 to 50
-    */
+    
     public function GetUsersByLIMIT($pageid)
     {
         $db = new DB();
@@ -374,13 +291,14 @@ class User
         $db = NULL;
         return $result;
     }
+    
     public function getUser($id)
     {
         $db = new DB();
         $query = "SELECT * FROM `users` WHERE `id`=".$id;
         $stm = $db->prepare($query);
         $stm->execute();
-        $result = $stm->fetchAll();
+        $result = $stm->fetch();
         $db = NULL;
         return $result;
     }

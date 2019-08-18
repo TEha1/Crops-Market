@@ -7,7 +7,7 @@ if (!isset($_SESSION['id'])) {
 }
 include_once '../Models/orderClass.php';
 $order = new Order();
-$num = $order->getNumberOfOrdersOfUser($_SESSION["id"]);
+$num = $order->getNumberOfOrders($_SESSION["id"]);
 $OrdersNumber = ceil($num / 10);
 //$OrdersNumber=$num;
 if (!isset($_GET['page'])) {
@@ -17,7 +17,7 @@ if (!isset($_GET['page'])) {
 } else {
     $page = (int) $_GET['page'];
 }
-$OrdersData = $order->GetOrdersByLIMITUser($page, $_SESSION["id"]);
+$OrdersData = $order->GetOrdersByLIMIT($page, $_SESSION["id"]);
 include_once '../Models/productClass.php';
 include_once 'NavBar.php';
 ?>
@@ -71,7 +71,7 @@ include_once 'NavBar.php';
                 }
                 ?>
 
-                <a href="../Controllers/deleteUserController.php?submit=DeleteUser"class="btn btn-danger" role="button" >
+                <a href="../Controllers/deleteUserController.php?DeleteUser=1"class="btn btn-danger" role="button" >
                     <i class="glyphicon glyphicon-trash"></i>
                 </a>
             </div>
@@ -79,11 +79,7 @@ include_once 'NavBar.php';
         <div class="col-sm-9">
             <div class="page-header">
                 <?php
-                if (0) {
-                    echo '<h1><small>Your Orders</small></h1>';
-                } else {
-                    echo '<h1><small>'.$SignIn["your_orders"].'</small></h1>';
-                }
+                echo '<h1><small>' . $SignIn["your_orders"] . '</small></h1>';
                 ?>
 
             </div>
@@ -92,33 +88,36 @@ include_once 'NavBar.php';
                 $product = new Product();
                 foreach ($OrdersData as $value) {
                     $productData = $product->getProduct($value['product']);
-                    if (0) {
-                        echo '<span href="" class="list-group-item myOrders">
-                            <a>' . $productData[0]["name_en"] . '</a>
-                           
-                            <form action="../Controllers/updateOrderController.php">
-                                <input type="number" name="quantity" placeholder="quantity: ' . $value["quantity"] . '">
-                                <input type"text" name="id" value="' . $value["id"] . '" style="display:none" >
-                                <input type="submit" name="submit"  value="Update">
-                                <a href="../Controllers/deleteOrderController.php?id=' . $value["id"] . '"class="btn btn-danger delete_order" role="button">
-                                    <i class="glyphicon glyphicon-trash"></i>
-                                </a>
-                            </form>
-                        </span> ';
+                    if ($_SESSION['lang'] == 'ar') {
+                        echo '<span class="list-group-item myOrders myOrders_">
+                                <a href="ProductInfo.php?id=' . $productData["id"] . '">' . $productData["name"] . '</a>
+
+                                <form action="../Controllers/updateOrderController.php" method="GET">
+                                    <input type="number" name="quantity" placeholder="quantity: ' . $value["quantity"] . '">
+                                    <input type"text" name="id" value="' . $value["id"] . '" style="display:none" >
+                                    <div>
+                                        <input type="submit" name="updateOrder"  value="Update">
+                                        <a href="../Controllers/deleteOrderController.php?id=' . $value["id"] . '"class="btn btn-danger delete_order_ delete_order" role="button">
+                                            <i class="glyphicon glyphicon-trash"></i>
+                                        </a>
+                                    </div>
+                                </form>
+                            </span> ';
                     } else {
-                        echo '
-                        <span href="" class="list-group-item myOrders_ myOrders">
-                            <a>' . $productData[0]["name_en"] . '</a>
-                           
-                            <form action="../Controllers/updateOrderController.php">
-                                <input type="number" name="quantity" placeholder="quantity: ' . $value["quantity"] . '">
-                                <input type"text" name="id" value="' . $value["id"] . '" style="display:none" >
-                                <input type="submit" name="submit"  value="' . $SignIn["update"] . '">
-                                <a href="../Controllers/deleteOrderController.php?id=' . $value["id"] . '"class="btn btn-danger delete_order_ delete_order" role="button">
-                                    <i class="glyphicon glyphicon-trash"></i>
-                                </a>
-                            </form>
-                        </span> ';
+                        echo '<span class="list-group-item myOrders">
+                                <a href="ProductInfo.php?id=' . $productData["id"] . '">' . $productData["name"] . '</a>
+
+                                <form action="../Controllers/updateOrderController.php" method="GET">
+                                    <input type="number" name="quantity" placeholder="quantity: ' . $value["quantity"] . '">
+                                    <input type"text" name="id" value="' . $value["id"] . '" style="display:none" >
+                                    <div>
+                                        <input type="submit" name="updateOrder"  value="Update">
+                                        <a href="../Controllers/deleteOrderController.php?id=' . $value["id"] . '"class="btn btn-danger delete_order" role="button">
+                                            <i class="glyphicon glyphicon-trash"></i>
+                                        </a>
+                                    </div>
+                                </form>
+                            </span> ';
                     }
                 }
                 ?>
@@ -185,40 +184,8 @@ include_once 'NavBar.php';
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
                         </div>
                         <div class="modal-body">';
-        if (0) {
-            echo '<form action="../Controllers/updateUserController.php" class="well" method="POST" enctype="multipart/form-data">
-                                <div class="form-group">
-                                    <label>First Name:</label>
-                                    <input  type="text" class="form-control" placeholder="' . $_SESSION["first_name"] . '" name="first_name" minlength="2" maxlength="100" >
-                                </div>
-                                <div class="form-group">
-                                    <label>Last Name:</label>
-                                    <input  type="text" class="form-control" placeholder=" ' . $_SESSION["last_name"] . '"  name="last_name" minlength="2" maxlength="100" >
-                                </div>
-                                <div class="form-group">
-                                    <label>Password:</label>
-                                    <input type="password" id="pass" class="form-control" placeholder="Enter password" name="password" minlength="10" maxlength="100" >
-                                </div>
-                                <div class="form-group">
-                                    <label >Repeat Password:</label>
-                                    <input type="password" id="rpass" class="form-control" id="re_pwd" placeholder="Enter password again" name="resetpassword"  minlength="10" maxlength="100">
-                                    <b id="not_matched" class="not_matched">not matched</b>
-                                    <b id="matched_" class="matched">matched</b>
-                                </div>
-                                <div class="form-group">
-                                    <label >Phone :</label>
-                                    <input type="text" class="form-control" placeholder="' . $phone . '" name="phone" maxlength="15">
-                                </div>
-                                <div class="form-group">
-                                    <label>Photo:</label>
-                                    <div class="text-center upload_form" >
-                                        <input  class="form-control" type="file" name="image">
-                                    </div>
-                                </div>
-                                <input id="update" name="submit" type="submit" class="btn btn-success disabled edit_profile_data_submit" value="Update" >
-                            </form>';
-        } else {
-            echo '<form action="../Controllers/updateUserController.php" class="well" method="POST" enctype="multipart/form-data">
+
+        echo '<form action="../Controllers/updateUserController.php" class="well" method="POST" enctype="multipart/form-data">
                                 <div class="form-group">
                                     <label>' . $SignIn["first_name"] . ':</label>
                                     <input  type="text" class="form-control" placeholder="' . $_SESSION["first_name"] . '" name="first_name" minlength="2" maxlength="100" >
@@ -234,8 +201,8 @@ include_once 'NavBar.php';
                                 <div class="form-group">
                                     <label >' . $SignIn["re_password"] . ':</label>
                                     <input type="password" id="rpass" class="form-control" id="re_pwd" placeholder="Enter password again" name="resetpassword"  minlength="10" maxlength="100">
-                                    <b id="not_matched" class="not_matched">not matched</b>
-                                    <b id="matched_" class="matched">matched</b>
+                                    <b id="not_matched" class="not_matched"><span class="glyphicon glyphicon-remove" ></span></b>
+                                    <b id="matched_" class="matched"><span class="glyphicon glyphicon-ok" ></span></b>
                                 </div>
                                 <div class="form-group">
                                     <label >' . $SignIn["mobile"] . ':</label>
@@ -247,9 +214,9 @@ include_once 'NavBar.php';
                                         <input  class="form-control" type="file" name="image">
                                     </div>
                                 </div>
-                                <input id="update" name="submit" type="submit" class="btn btn-success disabled edit_profile_data_submit" value="' . $SignIn["update"] . '" >
+                                <input id="update" name="Update" type="submit" class="btn btn-success edit_profile_data_submit" value="' . $SignIn["update"] . '" >
                             </form>';
-        }
+
         echo '</div>
                     </div>
                 </div>
@@ -258,7 +225,7 @@ include_once 'NavBar.php';
         if (isset($_SESSION["phone"])) {
             $phone = $_SESSION["phone"];
         } else {
-            $phone = 'Enter Your Phone Number';
+            $phone = $SignIn['enter_phone'];
         }
         echo'<div class="modal fade" id="updatePhoneModal" role="dialog">
                 <div class="modal-dialog modal-md">
@@ -268,12 +235,12 @@ include_once 'NavBar.php';
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
                         </div>
                         <div class="modal-body">
-                            <form action="../Controllers/updatePhoneUserController.php" class="well" method="POST" enctype="multipart/form-data">
+                            <form action="../Controllers/updatePhoneUserController.php" class="well" method="POST" >
                                 <div class="form-group">
-                                    <label >Phone :</label>
+                                    <label >' . $SignIn['phone'] . '</label>
                                     <input type="text" class="form-control" placeholder="' . $phone . '" name="phone" >
                                 </div>
-                                <input name="submit" type="submit" class="btn btn-success edit_profile_data_submit value="Update" >
+                                <input name="Update" type="submit" class="btn btn-success edit_profile_data_submit" value="Update" >
                             </form>
                         </div>
                     </div>

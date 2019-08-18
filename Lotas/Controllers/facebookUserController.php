@@ -9,39 +9,37 @@ if(isset($_GET['code']))
     {
         include_once '../Models/userClass.php';
         include_once '../Models/fbConfig.php'; 
-        //Initialize User class
         $user = new User();
-        //get user data from FacebookLogin
         $userData = $user->FacebookLogin($helper,$FB);
-        //Storing user data into session
-        if($userData[0]['block'] == 0)
+        if($userData['block'] == 0)
         {
-            $_SESSION['id'] = $userData[0]['id'];
-            $_SESSION['oauth_provider'] = $userData[0]['oauth_provider'];
-            $_SESSION['oauth_uid'] = $userData[0]['oauth_uid'];
-            $_SESSION['first_name'] = $userData[0]['first_name'];
-            $_SESSION['last_name'] = $userData[0]['last_name'];
-            $_SESSION['email'] = $userData[0]['email'];
-            $_SESSION['gender'] = $userData[0]['gender'];
-            $_SESSION['picture'] = $userData[0]['picture'];
-            $_SESSION['link'] = $userData[0]['link'];
+            $_SESSION['id']             = $userData['id'];
+            $_SESSION['oauth_provider'] = $userData['oauth_provider'];
+            $_SESSION['oauth_uid']      = $userData['oauth_uid'];
+            $_SESSION['first_name']     = $userData['first_name'];
+            $_SESSION['last_name']      = $userData['last_name'];
+            $_SESSION['email']          = $userData['email'];
+            $_SESSION['gender']         = $userData['gender'];
+            $_SESSION['picture']        = $userData['picture'];
+            $_SESSION['link']           = $userData['link'];
             //if user is exist and have phone number in database it will store in session
-            if(isset($userData[0]['phone'])) 
+            if(isset($userData['phone'])) 
             {
-                $_SESSION['phone'] = $userData[0]['phone'];
+                $_SESSION['phone'] = $userData['phone'];
             }
             header('Location: ' . filter_var('../Veiw/home.php', FILTER_SANITIZE_URL));
         }
         else
         {
-            echo'block';
+            header('Location: ' . filter_var('../Veiw/home.php', FILTER_SANITIZE_URL));
         }
         
     }
     catch (Exception $ex) 
     {
         //something wrong happen find an idea
-        echo $ex->getMessage();
+        //echo $ex->getMessage();
+        header('Location: ' . filter_var('../Veiw/home.php?notify=wrong_email', FILTER_SANITIZE_URL));
     }
 }
 else

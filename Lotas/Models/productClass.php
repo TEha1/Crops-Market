@@ -1,30 +1,386 @@
 <?php
-
+include_once 'phpqrcode/qrlib.php';
 include_once 'DB.php';
 /*
   this class about everything about product and table product in database
  */
-
 class Product {
-    /*
-     * *function addproduct insert new product in database and return id of it if it inserted
-     * *if not inserted return false
-     * *$productInfo is an array with product information like
-     * *name,name_ar,script_en,script_ar,price,image->image saved in Resources/ProductImages,
-     * *video->id of video in youtube
-     */
-
-    public function checkProduct($name, $name_ar) {
+    
+    private $id                     = 'id';
+    private $name                   = 'name' ;
+    private $name_ar                = 'name_ar';
+    private $active_ingredient_ar   = 'active_ingredient_ar';
+    private $properties_ar          = 'properties_ar';
+    private $features_ar            = 'features_ar';
+    private $active_ingredient      = 'active_ingredient';
+    private $properties             = 'properties';
+    private $features               = 'features';
+    private $image                  = 'image';
+    private $video                  = 'video';
+    private $visible                = 'visible';
+    private $category               = 'category';
+    private $product                = 'product';
+    private $crops                  = 'crops';
+    private $controlled_pest        = 'controlled_pest';
+    private $rate_of_use            = 'rate_of_use';
+    private $phi                    = 'phi';
+    private $crops_ar               = 'crops_ar';
+    private $controlled_pest_ar     = 'controlled_pest_ar';
+    private $rate_of_use_ar         = 'rate_of_use_ar';
+    private $phi_ar                 = 'phi_ar';
+    private $product_id             = 'product_id';
+    private $rate                   = 'rate';
+    private $price                  = 'price';
+    private $url                    = 'lotus.com';
+    
+    public function getProduct($id) {
         $db = new DB();
-        $querySelect = "SELECT * 
+        if(isset($_SESSION['admin']))
+        {
+            
+                $query = "SELECT
+                           *
+                         FROM
+                            $this->product 
+                         WHERE
+                            $this->id =" . $id;
+            
+        }
+        else
+        {
+            if($_SESSION['lang'] == 'ar')
+            {
+                $query = "SELECT
+                            $this->id, 
+                            $this->name_ar as name,
+                            $this->active_ingredient_ar as active_ingredient,
+                            $this->properties_ar as properties,
+                            $this->features_ar as features,
+                            $this->image,
+                            $this->video,
+                            $this->visible,
+                            $this->category
+                         FROM
+                            $this->product
+                         WHERE 
+                            $this->visible = 1
+                         AND
+                            $this->id =" . $id;
+            }
+            else
+            {
+                 $query = "SELECT
+                            $this->id, 
+                            $this->name as name,
+                            $this->active_ingredient as active_ingredient,
+                            $this->properties as properties,
+                            $this->features as features,
+                            $this->image,
+                            $this->video,
+                            $this->visible,
+                            $this->category
+                         FROM
+                            $this->product
+                         WHERE 
+                            $this->visible = 1
+                         AND
+                            $this->id =" . $id;
+            }
+        }
+        
+        $result = $db->prepare($query);
+        $result->execute();
+        $ProductData = $result->fetch();
+        $db = NULL;
+        $count = $result->rowCount();
+        if($count>0)
+        {
+            return $ProductData;
+        }
+        else
+        {
+            //return false for two conditions first the id is wrong second the product is not visible for user
+            return false;
+        }
+    }
+    
+    public function selectProduct($id, $col) {
+        $db = new DB();
+        $query = "SELECT " . $col . " FROM $this->product WHERE $this->id =" . $id;
+        $result = $db->prepare($query);
+        $result->execute();
+        $ProductData = $result->fetch();
+        $db = NULL;
+        return $ProductData;
+    }
+    
+    public function GetProductByLIMIT($pageid) {
+        $db = new DB();
+        $start = 12 * ($pageid - 1);
+        $row = 12;
+        if(isset($_SESSION['admin']))
+        {
+            if($_SESSION['lang']=='ar')
+            {
+                $query = "SELECT 
+                            $this->id,
+                            $this->name_ar as name ,
+                            $this->image ,
+                            $this->visible
                         FROM 
-                            `product` 
+                            $this->product
+                        LIMIT 
+                        $start,$row";
+            }
+            else
+            {
+                $query = "SELECT 
+                            $this->id ,
+                            $this->name as name ,
+                            $this->image  ,
+                            $this->visible
+                        FROM 
+                            $this->product 
+                        LIMIT 
+                        $start,$row";
+            }
+        }
+        else
+        {
+            if($_SESSION['lang']=='ar')
+            {
+                $query = "SELECT 
+                            $this->id,
+                            $this->name_ar as name ,
+                            $this->image  ,
+                            $this->price
+                        FROM 
+                            $this->product 
                         WHERE 
-                            `name` ='" . $name . "'
+                            $this->visible = 1 
+                        LIMIT 
+                        $start,$row";
+            }
+            else
+            {
+                $query = "SELECT 
+                            $this->id ,
+                            $this->name as name ,
+                            $this->image ,
+                            $this->price
+                        FROM 
+                            $this->product
+                        WHERE 
+                            $this->visible = 1 
+                        LIMIT 
+                        $start,$row";
+            }
+        }
+        $stm = $db->prepare($query);
+        $stm->execute();
+        $result = $stm->fetchAll();
+        $db = NULL;
+        $count = $stm->rowCount();
+        if($count>0)
+        {
+            return $result;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
+    public function GetProductByLIMITCtegory($pageid, $categoryId) {
+        $db = new DB();
+        $start = 12 * ($pageid - 1);
+        $row = 12;
+        if(isset($_SESSION['admin']))
+        {
+            if($_SESSION['lang'] == 'ar')
+            {
+                $query = "SELECT 
+                            $this->id,
+                            $this->name_ar as name ,
+                            $this->image ,
+                            $this->visible
+                        FROM 
+                            $this->product 
+                        WHERE 
+                            $this->category= $categoryId
+                        LIMIT $start,$row ";
+            }
+            else
+            {
+                $query = "SELECT 
+                            $this->id ,
+                            $this->name as name ,
+                            $this->image,
+                            $this->visible
+                        FROM
+                            $this->product 
+                        WHERE 
+                            $this->category= $categoryId
+                        LIMIT $start,$row ";
+            }
+        }
+        else
+        {
+            if($_SESSION['lang'] == 'ar')
+            {
+                $query = "SELECT 
+                            $this->id,
+                            $this->name_ar as name ,
+                            $this->image ,
+                            $this->price
+                        FROM 
+                            $this->product 
+                        WHERE 
+                            $this->category = $categoryId 
+                        AND 
+                            $this->visible = 1 
+                        LIMIT $start,$row ";
+            }
+            else
+            {
+                $query = "SELECT 
+                            $this->id ,
+                            $this->name as name ,
+                            $this->image ,
+                            $this->price
+                        FROM
+                            $this->product 
+                        WHERE 
+                            $this->category= $categoryId 
+                        AND 
+                            $this->visible = 1 
+                        LIMIT $start,$row ";
+            }
+        }
+        
+        
+        $stm = $db->prepare($query);
+        $stm->execute();
+        $result = $stm->fetchAll();
+        $db = NULL;
+        $count = $stm->rowCount();
+        if($count>0)
+        {
+            return $result;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
+    public function getNumberOfProduct() {
+        if(isset($_SESSION['admin']))
+        {
+            $query = "SELECT COUNT(id) as num FROM  $this->product";
+        }
+        else
+        {
+            $query = "SELECT COUNT(id) as num FROM $this->product WHERE $this->visible = 1 ";
+        }
+        
+        $db = new DB();
+        $result = $db->prepare($query);
+        $result->execute();
+        $data = $result->fetch();
+        $db=NULL;
+        return $data['num'];
+    }
+    
+    public function getNumberOfProductOfCategory($categoryId) {
+        if(isset($_SESSION['admin']))
+        {
+            $query = "SELECT COUNT(id) as num FROM $this->product WHERE $this->category= $categoryId ";
+        }
+        else
+        {
+            $query = "SELECT COUNT(id) as num FROM $this->product WHERE $this->category= $categoryId AND $this->visible = 1";
+        }
+        
+        $db = new DB();
+        $result = $db->prepare($query);
+        $result->execute();
+        $data = $result->fetch();
+        $db=NULL;
+        return $data['num'];
+    }
+    
+    public function selectRate($product_id) {
+
+        $db = new DB();
+        if(isset($_SESSION['admin'])) {
+             $query = "SELECT 
+                        *
+                    FROM 
+                        $this->rate
+                    WHERE 
+                        $this->product_id =" . $product_id;
+        } else {
+            if($_SESSION['lang'] == 'ar')
+            {
+                $query = "SELECT 
+                            $this->crops_ar as crops ,
+                            $this->controlled_pest_ar as controlled_pest,
+                            $this->rate_of_use_ar as rate_of_use,
+                            $this->phi_ar as phi
+                        FROM 
+                            $this->rate
+                        WHERE 
+                            $this->product_id = $product_id ";
+            }
+            else
+            {
+                $query = "SELECT 
+                            $this->crops ,
+                            $this->controlled_pest ,
+                            $this->rate_of_use ,
+                            $this->phi 
+                        FROM 
+                            $this->rate
+                        WHERE 
+                            $this->product_id = $product_id";
+            }
+        }
+        
+        $result = $db->prepare($query);
+        $result->execute();
+        $ProductData = $result->fetchAll();
+        $db = NULL;
+        return $ProductData;
+    }
+    
+    public function getNumberOfRate($product_id) {
+        $query = "SELECT COUNT(id) as num FROM $this->rate WHERE $this->product_id = $product_id ";
+        $db = new DB();
+        $result = $db->prepare($query);
+        $db = NULL;
+        $result->execute();
+        $data = $result->fetch();
+        return $data['num'];
+    }
+    
+    /*
+    ** All Function After This Comment For Admin Only
+    */
+    
+    
+    public function checkProduct($name = "", $name_ar = "") {
+        $db = new DB();
+        $querySelect = "SELECT $this->id
+                        FROM 
+                            $this->product 
+                        WHERE 
+                            $this->name ='" . $name . "'
                         OR 
-                            `name_ar` = '" . $name_ar . "'";
+                            $this->name_ar = '" . $name_ar . "'";
         $result = $db->prepare($querySelect);
         $result->execute();
+        $db=null;
         if ($result->rowCount() > 0) {
             return false;
         } else {
@@ -32,342 +388,138 @@ class Product {
         }
     }
 
+     public function checkProductId($id) {
+        $db = new DB();
+        $querySelect = "SELECT $this->id
+                        FROM 
+                            $this->product 
+                        WHERE 
+                            $this->id ='" . $id . "'";
+        $result = $db->prepare($querySelect);
+        $result->execute();
+        $db=null;
+        if ($result->rowCount() > 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
     public function addProduct($productInfo) {
         $db = new DB();
-
         $queryInsert = "INSERT INTO 
-                                `product` 
-                                (`name`, 
-                                `name_ar`,
-                                `active_ingredient_ar`,
-                                `properties_ar`,
-                                `features_ar`,
-                                `active_ingredient`,
-                                `properties`,
-                                `features`,
-                                `image`, 
-                                `video`,
-                                `category`) 
+                                $this->product 
+                                ($this->name, 
+                                $this->name_ar,
+                                $this->active_ingredient_ar,
+                                $this->properties_ar,
+                                $this->features_ar,
+                                $this->active_ingredient,
+                                $this->properties,
+                                $this->features,
+                                $this->image, 
+                                $this->video,
+                                $this->category,
+                                $this->price) 
                             VALUES 
                                 ('" . $productInfo['name'] .
-                "', '" . $productInfo['name_ar'] .
-                "', '" . $productInfo['active_ingredient_ar'] .
-                "', '" . $productInfo['properties_ar'] .
-                "', '" . $productInfo['features_ar'] .
-                "', '" . $productInfo['active_ingredient'] .
-                "', '" . $productInfo['properties'] .
-                "', '" . $productInfo['features'] .
-                "', '" . $productInfo['image'] .
-                "', '" . $productInfo['video'] .
-                "', '" . $productInfo['category'] . "')";
+                                "', '" . $productInfo['name_ar'] .
+                                "', '" . $productInfo['active_ingredient_ar'] .
+                                "', '" . $productInfo['properties_ar'] .
+                                "', '" . $productInfo['features_ar'] .
+                                "', '" . $productInfo['active_ingredient'] .
+                                "', '" . $productInfo['properties'] .
+                                "', '" . $productInfo['features'] .
+                                "', '" . $productInfo['image'] .
+                                "', '" . $productInfo['video'] .
+                                "', '" . $productInfo['category'] .
+                                "', '" . $productInfo['price'] . "')";
         $sql = $db->prepare($queryInsert);
         $result = $sql->execute();
+        
         if ($result) {
-            $querySelect = "SELECT 
-                                    `id` 
-                                FROM 
-                                    `product` 
-                                WHERE 
-                                    `name` ='" . $productInfo['name'] . "'";
+            $querySelect = "SELECT `id` FROM `product` WHERE `name` = '" . $productInfo['name']."'" ;
             $sql = $db->prepare($querySelect);
             $sql->execute();
-            $data = $sql->fetchAll();
+            $data = $sql->fetch();
             $db = NULL;
-            return $data[0]['id'];
+            @QRcode::png('https://teha43.000webhostapp.com/Veiw/ProductInfo.php?id='.$data['id'], '../Resources/QRimages/'.$data['id'].'.png', QR_ECLEVEL_L, 4);
+            return $data['id'];
         } else {
             $db = NULL;
             return 'Not Inserted';
         }
     }
-
-    /*
-     * *get product information by id of product
-     */
-
-    public function getProduct($id) {
-        $db = new DB();
-        $query = "SELECT * FROM `product` WHERE `id` =" . $id;
-        $result = $db->prepare($query);
-        $result->execute();
-        $ProductData = $result->fetchAll();
-        $db = NULL;
-        return $ProductData;
-    }
-
-    /*
-     * *update one column in one time 
-     * *$id id of product
-     * *$col column i want to update
-     * *$data data i want to set
-     * *if updated reurn true else return false
-     */
-
-    public function updateProduct($id, $col, $data) {
-        $db = new DB();
-        $query = "UPDATE `product` SET `" . $col . "` = '" . $data . "' WHERE `id` = " . $id;
-        $stm = $db->prepare($query);
-        if ($stm->execute()) {
-            $db = NULL;
-            return TRUE;
-        } else {
-            $db = NULL;
-            return FALSE;
-        }
-    }
-
-    public function get_productAr($id) {
-        $db = new DB();
-        $query = "SELECT
-                 `id`, `name_ar`, `active_ingredient_ar`, `properties_ar`,
-                 `features_ar`, `image`, `video`, `visible`, `category`
-                 FROM
-                 `product` WHERE `id` =" . $id;
-        $result = $db->prepare($query);
-        $result->execute();
-        $ProductData = $result->fetchAll();
-        $db = NULL;
-        return $ProductData;
-    }
-
-    public function getProductEn($id) {
-        $db = new DB();
-        $query = "SELECT
-                 `id`, `name`, `active_ingredient`, `properties`,
-                 `features`, `image`, `video`, `visible`, `category`
-                 FROM
-                 `product` WHERE `id` =" . $id;
-
-        $result = $db->prepare($query);
-        $result->execute();
-        $ProductData = $result->fetchAll();
-        $db = NULL;
-        return $ProductData;
-    }
-
-    /*
-     * *delete one product in one time by id
-     * *if deleted return true else return false
-     */
-
+    
     public function deleteProduct($id) {
         $db = new DB();
-        $query = "DELETE FROM `product` WHERE `id`= " . $id;
+        $query = "DELETE FROM $this->product WHERE $this->id= " . $id;
         $stm = $db->prepare($query);
-        if ($stm->execute()) {
-            $db = NULL;
-            return TRUE;
-        } else {
-            $db = NULL;
-            return false;
-        }
-    }
-
-    /*
-     * *get one column from specific product by id
-     */
-
-    public function selectProduct($id, $col) {
-        $db = new DB();
-        $query = "SELECT " . $col . " FROM `product` WHERE `id` =" . $id;
-        $db->arabic();
-        $result = $db->prepare($query);
-        $result->execute();
-        $ProductData = $result->fetchAll();
         $db = NULL;
-        return $ProductData;
+        if ($stm->execute()) {return TRUE;} else {return false;}
     }
-
-    /*
-     * *function visible if product has in visible column 1 make it 0 and vice versa 
-     * *$id the id of product
-     */
-
+    public function deleteRate($id) {
+        $db = new DB();
+        $query = "DELETE FROM $this->rate WHERE $this->id= " . $id;
+        $stm = $db->prepare($query);
+        $db = NULL;
+        if ($stm->execute()) {return TRUE;} else {return false;}
+    }
+    
+    public function updateProduct($id, $col, $data) {
+        $db = new DB();
+        $query = "UPDATE $this->product SET `" . $col . "` = '" . $data . "' WHERE $this->id = " . $id;
+        $stm = $db->prepare($query);
+        $db = NULL;
+        if ($stm->execute()) {return TRUE;} else {return FALSE;}
+    }
+    
     public function visible($id) {
-        $visible = $this->selectProduct($id, 'visible');
-        if ($visible[0]['visible'] == 1) {
-            $this->updateProduct($id, 'visible', 0);
+        $visible = $this->selectProduct($id, $this->visible);
+        if ($visible['visible'] == 1) {
+            $this->updateProduct($id, $this->visible, 0);
         } else {
-            $this->updateProduct($id, 'visible', 1);
+            $this->updateProduct($id, $this->visible, 1);
         }
     }
-
-    /*
-     * *function GetProductByLIMIT get 10 rows from product 
-     * *if $pageid = 5 the limet get from 40 to 50
-     */
-
-    public function GetProductByLIMIT($pageid) {
+    
+    public function updateRate($id, $col, $data) {
         $db = new DB();
-        $start = 12 * ($pageid - 1);
-        $row = 12;
-        $query = "SELECT * FROM `product` WHERE `visible` = 1 LIMIT $start,$row";
+        $query = "UPDATE $this->rate SET `" . $col . "` = '" . $data . "' WHERE $this->id = '" . $id."'";
         $stm = $db->prepare($query);
-        $stm->execute();
-        $result = $stm->fetchAll();
         $db = NULL;
-        return $result;
+        if ($stm->execute()) {return TRUE;} else {return FALSE;}
     }
-
-    /*
-     * *function GetProductByLIMIT get 10 rows from product in specific category 
-     * *if $pageid = 5 the limet get from 40 to 50
-     */
-
-    public function GetProductByLIMITCtegory($pageid, $categoryId) {
+    
+    public function addRate($product_id, $rateInfo) {
         $db = new DB();
-        $start = 12 * ($pageid - 1);
-        $row = 12;
-        $query = "SELECT * FROM `product` WHERE `category`= $categoryId AND `visible` = 1 LIMIT $start,$row ";
-        $stm = $db->prepare($query);
-        $stm->execute();
-        $result = $stm->fetchAll();
-        $db = NULL;
-        return $result;
-    }
-
-    /*
-     * *function getNumberOfProduct return number of all product
-     */
-
-    public function getNumberOfProduct() {
-        $query = "SELECT * FROM `product` WHERE `visible` = 1 ";
-        $db = new DB();
-        $result = $db->prepare($query);
-        $result->execute();
-        $data = $result->rowCount();
-        return $data;
-    }
-
-    /*
-     * *function getNumberOfProductOfCategory return number of products in specific category
-     * *$categoryId the category id
-     */
-
-    public function getNumberOfProductOfCategory($categoryId) {
-        $query = "SELECT * FROM `product` WHERE `category`= $categoryId AND `visible` = 1";
-        $db = new DB();
-        $result = $db->prepare($query);
-        $result->execute();
-        $data = $result->rowCount();
-        return $data;
-    }
-
-    public function GetProductByLIMITAdmin($pageid) {
-        $db = new DB();
-        $start = 12 * ($pageid - 1);
-        $row = 12;
-        $query = "SELECT * FROM `product` LIMIT $start,$row";
-        $stm = $db->prepare($query);
-        $stm->execute();
-        $result = $stm->fetchAll();
-        $db = NULL;
-        return $result;
-    }
-
-    /*
-     * *function GetProductByLIMIT get 10 rows from product in specific category 
-     * *if $pageid = 5 the limet get from 40 to 50
-     */
-
-    public function GetProductByLIMITCtegoryAdmin($pageid, $categoryId) {
-        $db = new DB();
-        $start = 12 * ($pageid - 1);
-        $row = 12;
-        $query = "SELECT * FROM `product` WHERE `category`= $categoryId  LIMIT $start,$row ";
-        $stm = $db->prepare($query);
-        $stm->execute();
-        $result = $stm->fetchAll();
-        $db = NULL;
-        return $result;
-    }
-
-    /*
-     * *function getNumberOfProduct return number of all product
-     */
-
-    public function getNumberOfProductAdmin() {
-        $query = "SELECT * FROM  `product`";
-        $db = new DB();
-        $result = $db->prepare($query);
-        $result->execute();
-        $data = $result->rowCount();
-        return $data;
-    }
-
-    /*
-     * *function getNumberOfProductOfCategory return number of products in specific category
-     * *$categoryId the category id
-     */
-
-    public function getNumberOfProductOfCategoryAdmin($categoryId) {
-        $query = "SELECT * FROM `product` WHERE `category`= $categoryId ";
-        $db = new DB();
-        $result = $db->prepare($query);
-        $result->execute();
-        $data = $result->rowCount();
-        return $data;
-    }
-
-    public function addRateOfUse($product_id, $rateOfUseInfo) {
-        $db = new DB();
-        $query = "INSERT INTO `rate_of_use` 
-                    (`crops`,
-                    `controlled_pest`,
-                    `rate_of_use`,
-                    `phi`,
-                    `crops_ar`,
-                    `controlled_pest_ar`,
-                    `rate_of_use_ar`,
-                    `phi_ar`,
-                    `product_id`) 
+        $query = "INSERT INTO $this->rate 
+                    ($this->crops,
+                    $this->controlled_pest,
+                    $this->rate_of_use,
+                    $this->phi,
+                    $this->crops_ar,
+                    $this->controlled_pest_ar,
+                    $this->rate_of_use_ar,
+                    $this->phi_ar,
+                    $this->product_id) 
                   VALUES 
-                  ('" . $rateOfUseInfo['crops'] .
-                "', '" . $rateOfUseInfo['controlled_pest'] .
-                "', '" . $rateOfUseInfo['rate_of_use'] .
-                "', '" . $rateOfUseInfo['phi'] .
-                "', '" . $rateOfUseInfo['crops_ar'] .
-                "', '" . $rateOfUseInfo['controlled_pest_ar'] .
-                "', '" . $rateOfUseInfo['rate_of_use_ar'] .
-                "', '" . $rateOfUseInfo['phi_ar'] .
-                "', '" . $rateOfUseInfo['product_id'] .
+                   ('" . $rateInfo['crops'] .
+                "', '" . $rateInfo['controlled_pest'] .
+                "', '" . $rateInfo['rate_of_use'] .
+                "', '" . $rateInfo['phi'] .
+                "', '" . $rateInfo['crops_ar'] .
+                "', '" . $rateInfo['controlled_pest_ar'] .
+                "', '" . $rateInfo['rate_of_use_ar'] .
+                "', '" . $rateInfo['phi_ar'] .
+                "', '" . $product_id .
                 "')";
-        $sql = $db->prepare($queryInsert);
+        $sql = $db->prepare($query);
         $result = $sql->execute();
         $db = NULL;
         return $result;
     }
-
-    public function selectRateOfUse($product_id) {
-
-        $db = new DB();
-        $query = "SELECT * FROM `rate_of_use` WHERE `product_id` =" . $product_id;
-        $result = $db->prepare($query);
-        $result->execute();
-        $ProductData = $result->fetchAll();
-        $db = NULL;
-        return $ProductData;
-    }
-
-    public function updateRateOfUse($id, $col, $data) {
-        $db = new DB();
-        $query = "UPDATE `rate_of_use` SET `" . $col . "` = '" . $data . "' WHERE `id` = " . $id;
-        $stm = $db->prepare($query);
-        if ($stm->execute()) {
-            $db = NULL;
-            return TRUE;
-        } else {
-            $db = NULL;
-            return FALSE;
-        }
-    }
-
-    public function getNumberOfRateOfUse($product_id) {
-        $query = "SELECT * FROM `rate_of_use` WHERE `product_id` = $product_id ";
-        $db = new DB();
-        $result = $db->prepare($query);
-        $result->execute();
-        $data = $result->rowCount();
-        return $data;
-    }
-
+    
+    
+    
 }

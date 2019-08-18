@@ -1,42 +1,44 @@
 <?php
     $NavBar = array(
-        "home" => "Home",
-        "values" => "Values",
-        "services" => "Services",
-        "contact" => "Contact",
-        "products" => "Products",
-        "maintain" => "Maintain",
-        "profile" => "Profile",
-        "login" => "Login",
-        "logout" => "Logout",
-        "signup" => "SihnUp",
-        "edit_home_script" => "Edit Home Script",
-        "add_product" => "Add Product",
-        "add_category" => "Add Category",
-        "orders_users" => "Orders and Users",
-        "about_company" => "About Company",
+        "home"              => "Home",
+        "values"            => "Values",
+        "services"          => "Services",
+        "contact"           => "Contact",
+        "products"          => "Products",
+        "maintain"          => "Maintain",
+        "profile"           => "Profile",
+        "login"             => "Login",
+        "logout"            => "Logout",
+        "signup"            => "SignUp",
+        "edit_home_script"  => "Edit Home Script",
+        "add_product"       => "Add Product",
+        "add_category"      => "Add Category",
+        "orders_users"      => "Orders and Users",
+        "about_company"     => "About Company",
+        "add_admin"         => "Add Admin"
         
     );
 
     $Products = array(
-        "categories" => "Categories",
-        "all_products" => "All Products",
-        "next" => "next",
-        "prev" => "previous"
+        "categories"    => "Categories",
+        "all_products"  => "All Products",
+        "next"          => "next",
+        "prev"          => "previous"
     );
 
     $Admin_Product = array(
         "definition" => "Defifntion",
         "structure" => "Structure",
         "using_way" => "Using Way",
-        "advantages" => "Advantages",
+        "rate_of_use" => "Rate Of Use",
         "select_category" => "Select Category",
         "product_name" => "Product Name",
-        "effective_material" => "Effective Material",
-        "chemical_group" => "Chemical Group",
-        "chemical_increase" => "Chemical Increase",
+        "active_ingredient" => "Active Ingredient",
+        "properties" => "Properties",
+        "features" => "Features",
         "how_to_use" => "How To Use",
-        "explanation_video" => "Explanation Video"
+        "explanation_video" => "Explanation Video",
+        "explanation_video_id" => "Explanation Video ID"
     );
 
     $Orders = array(
@@ -70,13 +72,45 @@
         "female" => "Female",
         "photo" => "Photo",
         "mobile" => "Mobile",
-        "enter_fn" => "enter first name",
-        "enter_ln" => "enter last name",
-        "enter_email" => "enter email",
-        "enter_password" => "enter password",
-        "enter_pw_again" => "enter password again",
+        "enter_fn" => "Enter First Name",
+        "enter_ln" => "Enter Last Name",
+        "enter_email" => "Enter Email",
+        "enter_password" => "Enter Password",
+        "enter_pw_again" => "Enter Password Again",
         "male" => "Male",
         "female" => "Female",
         "update" => "Update",
-        "your_orders" => "Your Orders"
+        "your_orders" => "Your Orders",
+        "enter_phone" => "Enter Phone Number",
+        "phone" => "Phone Number",
+        "add_admin" => "Add Admin",
+        "add_category" => "Add Ctegory",
+        "delete_category" => 'Delete Category',
+        "delete_admin" => 'Delete Admin',
+        "quantity" => 'َQuantity',
+        "receiver_email" => 'Receiver Email',
+        "password_manager" => 'Change Password of Manager'
+    );
+    $ProductInfo = array(
+        "crops" => "Crops",
+        "controlled_pest" => "Controlled Pest",
+        "rate_of_use" => "Rate Of Use",
+        "phi" => "PHI"
+    );
+    $Arabic = array(
+        "product_name" => "اسم المنتج",
+        "enter_product_name" => "ادخل اسم المنتج",
+        "active_ingredient" => "الماده الفعاله",
+        "properties" => "الخصائص",
+        "features" => "مميزات",
+        "category_name" => "اسم الفئه",
+        "enter_category_name" => "ادخل اسم الفئه"
+    );
+    $English = array(
+        "product_name" => "Product Name",
+        "active_ingredient" => "Active Ingredient",
+        "properties" => "Properties",
+        "features" => "Features",
+        "category_name" => "Category Name",
+        "enter_category_name" => "Enter Category Name"
     );

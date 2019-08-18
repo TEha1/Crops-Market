@@ -9,11 +9,7 @@ $allCategories = $category->getAllCategories();
 if (!isset($_GET['c']) || $_GET['c'] == 0) {
     $categoryId = 0;
     $product = new Product();
-    if (isset($_SESSION['admin'])) {
-        $ProductsNumber = $product->getNumberOfProductAdmin();
-    } else {
-        $ProductsNumber = $product->getNumberOfProduct();
-    }
+    $ProductsNumber = $product->getNumberOfProduct();
     $ProductPage = ceil($ProductsNumber/12);
     if (!isset($_GET['page'])) {
         $page = 1;
@@ -22,23 +18,16 @@ if (!isset($_GET['c']) || $_GET['c'] == 0) {
     } else {
         $page = (int) $_GET['page'];
     }
-    if (isset($_SESSION['admin'])) {
-        $productData = $product->GetProductByLIMITAdmin($page);
-    } else {
-        $productData = $product->GetProductByLIMIT($page);
-    }
+    $productData = $product->GetProductByLIMIT($page);
+
 } else {
     if (!in_array($_GET['c'], array_column($allCategories, 'id'))) {
         header('Location: ' . filter_var('Products.php', FILTER_SANITIZE_URL));
     } else {
         $categoryId = $_GET['c'];
         $product = new Product();
-        if (isset($_SESSION['admin'])) {
-            $ProductsNumber = $product->getNumberOfProductOfCategoryAdmin($categoryId);
-        } else {
-            $ProductsNumber = $product->getNumberOfProductOfCategory($categoryId);
-        }
-        $ProductPage = $ProductsNumber;
+        $ProductsNumber = $product->getNumberOfProductOfCategory($categoryId);
+        $ProductPage = ceil($ProductsNumber/12);
         if (!isset($_GET['page'])) {
             $page = 1;
         } elseif ($_GET['page'] > $ProductPage) {
@@ -47,11 +36,7 @@ if (!isset($_GET['c']) || $_GET['c'] == 0) {
             $page = (int) $_GET['page'];
         }
     }
-    if (isset($_SESSION['admin'])) {
-        $productData = $product->GetProductByLIMITCtegoryAdmin($page, $categoryId);
-    } else {
-        $productData = $product->GetProductByLIMITCtegory($page, $categoryId);
-    }
+    $productData = $product->GetProductByLIMITCtegory($page, $categoryId);
 }
 include_once 'NavBar.php';
 ?>
@@ -64,25 +49,17 @@ include_once 'NavBar.php';
             ?>
             <ul class="nav nav-pills nav-stacked">
                 <?php
-                if (0) {
-                    if ($categoryId === 0) {
-                        echo '<li class="active"><a href="Products.php">Categories</a></li>';
-                    } else {
-                        echo '<li><a href="Products.php">All Products</a></li>';
-                    }
+                
+                if ($categoryId === 0) {
+                    echo '<li class="active"><a href="Products.php">' . $Products["all_products"] . '</a></li>';
                 } else {
-                    if ($categoryId === 0) {
-                        echo '<li class="active"><a href="Products.php">' . $Products["all_products"] . '</a></li>';
-                    } else {
-                        echo '<li><a href="Products.php">' . $Products["all_products"] . '</a></li>';
-                    }
+                    echo '<li><a href="Products.php">' . $Products["all_products"] . '</a></li>';
                 }
-
                 foreach ($allCategories as $value) {
                     if ($value['id'] == $categoryId) {
-                        echo '<li class="active"><a href="Products.php?c=' . $value["id"] . '">' . $value['name_en'] . '</a></li>';
+                        echo '<li class="active"><a href="Products.php?c=' . $value["id"] . '">' . $value['name'] . '</a></li>';
                     } else {
-                        echo '<li><a href="Products.php?c=' . $value["id"] . '">' . $value['name_en'] . '</a></li>';
+                        echo '<li><a href="Products.php?c=' . $value["id"] . '">' . $value['name'] . '</a></li>';
                     }
                 }
                 ?>
@@ -92,15 +69,23 @@ include_once 'NavBar.php';
         <div class="col-sm-9">   
 
             <?php
-            $numOfProduct = count($productData);
-            $RowCount = ceil($numOfProduct / 3);
+            if(is_array($productData))
+            {
+                $numOfProduct = count($productData);
+                $RowCount = ceil($numOfProduct / 3);
+            }
+            else
+            {
+                $numOfProduct = 0;
+                $RowCount = ceil($numOfProduct / 3);
+            }
             if (isset($_SESSION['id'])) {
                 for ($i = 0; $i < $RowCount; $i++) {
                     echo'<div class="row">';
-                    for ($j = $i * 3; $j < $i + 3 && $j < $numOfProduct; $j++) {
+                    for ($j = $i * 3; $j < $i*3 + 3 && $j < $numOfProduct; $j++) {
                         echo'<div class="col-sm-4">
                         <div class="panel panel-primary text-center">
-                            <div class="panel-heading">' . $productData[$j]['name_en'] . '</div>
+                            <div class="panel-heading product"><a href="ProductInfo.php?id='.$productData[$j]['id'].'" >' . $productData[$j]['name'] . '</a></div>
                             <div class="panel-body product_img">
                                 <img src="../Resources/ProductImages/' . $productData[$j]['image'] . '" class="img-responsive" alt="Image"></div>
                             <div class="panel-footer">
@@ -115,7 +100,7 @@ include_once 'NavBar.php';
             } elseif (isset($_SESSION['admin'])) {
                 for ($i = 0; $i < $RowCount; $i++) {
                     echo'<div class="row">';
-                    for ($j = $i * 3; $j < $i + 3 && $j < $numOfProduct; $j++) {
+                    for ($j = $i * 3; $j < $i*3 + 3 && $j < $numOfProduct; $j++) {
                         if ($productData[$j]['visible'] == 1) {
                             $visible = 'btn-warning';
                         } else {
@@ -123,16 +108,16 @@ include_once 'NavBar.php';
                         }
                         echo'<div class="col-sm-4">
                                 <div class="panel panel-success text-center">
-                                    <div class="panel-heading">' . $productData[$j]['name'] . '</div>
+                                    <div class="panel-heading"><a href="ProductInfo.php?id='.$productData[$j]['id'].'" >' . $productData[$j]['name'] . '</a></div>
                                     <div class="panel-body product_img"><img src="../Resources/ProductImages/' . $productData[$j]['image'] . '" alt="Image"></div>
                                     <div class="panel-footer">
-                                        <a href="Admin_edit_product.php" class="btn btn-success">
+                                        <a href="Admin_edit_product.php?id='.$productData[$j]['id'].'" class="btn btn-success">
                                             <span class="glyphicon glyphicon-edit"></span>
                                         </a>
-                                        <a href="../Controllers/deleteProductController.php?submit=DeleteProduct&id=' . $productData[$j]['id'] . ' "class="btn btn-danger">
+                                        <a href="../Controllers/deleteProductController.php?DeleteProduct=1&id=' . $productData[$j]['id'] . ' "class="btn btn-danger">
                                             <span class="glyphicon glyphicon-trash"></span>
                                         </a>
-                                        <a href="../Controllers/invisibleProductController.php?submit=Visible&id=' . $productData[$j]['id'] . ' " class="btn ' . $visible . '">
+                                        <a href="../Controllers/invisibleProductController.php?Visible=1&id=' . $productData[$j]['id'] . ' " class="btn ' . $visible . '">
                                             <span class="glyphicon glyphicon-ban-circle"></span>
                                         </a>
                                     </div>
@@ -144,10 +129,10 @@ include_once 'NavBar.php';
             } else {
                 for ($i = 0; $i < $RowCount; $i++) {
                     echo'<div class="row">';
-                    for ($j = $i * 3; $j < $i + 3 && $j < $numOfProduct; $j++) {
+                    for ($j = $i * 3; $j < $i*3 + 3 && $j < $numOfProduct; $j++) {
                         echo'<div class="col-sm-4">
                                 <div class="panel panel-primary text-center">
-                                    <div class="panel-heading product"><a href="" >' . $productData[$j]['name'] . '</a></div>
+                                    <div class="panel-heading product"><a href="ProductInfo.php?id='.$productData[$j]['id'].'" >' . $productData[$j]['name'] . '</a></div>
                                     <div class="panel-body product_img">
                                         <img src="../Resources/ProductImages/' . $productData[$j]['image'] . '" class="img-responsive" alt="Image"></div>
                                     <div class="panel-footer">
@@ -204,7 +189,7 @@ include_once 'NavBar.php';
                     }
                     //<!-- Show last two pages if we're not near them -->
                     if ($page < $ProductPage) {
-                        echo'<li class="next"><a href="Products.php?c=' . $categoryId . 'page=' . $nextPage . '">' . $Products["next"] . '</a></li>';
+                        echo'<li class="next"><a href="Products.php?c=' . $categoryId . '&page=' . $nextPage . '">' . $Products["next"] . '</a></li>';
                     }
                     ?>
                 </ul>
@@ -214,9 +199,11 @@ include_once 'NavBar.php';
     </div>
     <!-- Model Order -->
     <?php
-    $numOfProduct = count($productData);
-    $RowCount = ceil($numOfProduct / 3);
-    if (isset($_SESSION['id'])) {
+    if(is_array($productData))
+    {
+        $numOfProduct = count($productData);
+        $RowCount = ceil($numOfProduct / 3);
+        if (isset($_SESSION['id'])) {
         foreach ($productData as $value) {
             echo'<div class="modal fade" id="' . $value['id'] . '" role="dialog">
                     <div class="modal-dialog modal-md">
@@ -227,7 +214,7 @@ include_once 'NavBar.php';
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                             </div>
                             <div class="modal-body">
-                                <form action=" " class="well" method="POST">
+                                <form action="../Controllers/addOrderController.php" class="well" method="POST">
                                     <input type="number" name="productId" value="' . $value['id'] . '" style="display: none;">
                                     <div class="form-group">
                                         <span  class="order_dialog">Quantity :</span>
@@ -240,7 +227,7 @@ include_once 'NavBar.php';
                                     <div class="form-group">
                                         <span  class="order_dialog">Full Price : </span><span>0</span>  EGP<br>
                                     </div>
-                                    <input name="submit" type="submit" class="btn btn-success apply_btn" value="Order" >
+                                    <input name="addOrder" type="submit" class="btn btn-success apply_btn" value="Order" >
                                 </form>
                             </div>
 
@@ -250,34 +237,9 @@ include_once 'NavBar.php';
                 </div>';
         }
     }
+    }
+    
     ?>
-    <div class="modal fade" id="orderModal" role="dialog">
-        <div class="modal-dialog modal-md">
-
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <form action=" " class="well" method="POST">
-
-                        <div class="form-group">
-                            <span  class="order_dialog">Quantity :</span>
-                            <input  type="number" class="form-control" id="quantity" name="quantity" required>
-                        </div>
-
-                        <div class="form-group">
-                            <span class="order_dialog">Full Price : </span><span id="total_price">0 </span> EGP<br>
-                        </div>
-                        <input name="submit" type="submit" class="btn btn-success apply_btn" value="Order" >
-                    </form>
-                </div>
-
-            </div>
-
-        </div>
-    </div>
     <script src="../Resources/JS/products.js"></script>
 </div>
 <?php include './footer.php'; ?>

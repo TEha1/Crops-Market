@@ -1,8 +1,15 @@
+@import url(https://fonts.googleapis.com/css?family=Cairo);
+
+body{
+    font-family: 'Cairo', sans-serif;
+    color: #818181;
+}
+/*
 body {
     font: 400 15px Lato, sans-serif;
     line-height: 1.8;
     color: #818181;
-}
+}*/
 a:hover {
     text-decoration: none
 }
@@ -208,6 +215,7 @@ input[type=submit]:hover {
 .cover {
     background-color: #522323;
     margin-top: 50px;
+    margin-bottom: 5px
 }
 
 .cover img {
@@ -314,6 +322,37 @@ table {
     }   
 }
 
+@media screen and (min-width: 1024px) {
+    .product_img {
+        height: 200px
+    }
+    .product_img img {
+        width: 100%;
+        height: 100%;
+        margin: auto
+    }
+}
+    
+@media screen and (min-width: 1224px) {
+    .product_img {
+        height: 300px
+    }
+    .product_img img {
+        width: 100%;
+        height: 100%;
+        margin: auto
+    }
+}
+@media screen and (min-width: 1824px) {
+    .product_img {
+        height: 400px
+    }
+    .product_img img {
+        width: 100%;
+        height: 100%;
+        margin: auto
+    }
+}
 /* Products */
 
 
@@ -339,15 +378,29 @@ table {
     border: 2px solid;
     border-color: #04040426;
     padding-left: 5px;
+    height: 35px;
+}
+.myOrders form div {
+    float: right
 }
 .edit_profile_data {
     margin-right: 10px
 }
 .delete_order {
-    margin-bottom: 5px
+    margin-bottom: 5px;
+    margin-left: 5px;
 }
 .edit_profile_data_submit {
     width: 100%
+}
+@media screen and (max-width: 768px) {
+    .profile_img {
+        height: 400px
+    }
+    .profile_img img {
+        width: 80%;
+        height: 98%
+    }
 }
 /* My Profile */
 
@@ -361,8 +414,11 @@ table {
 .myNavTabs ul {
     margin-bottom: 10px
 }
-.row {
-
+.tab-content {
+    margin: 5px
+}
+.edit__ {
+    margin: -1px
 }
 .header_test{
     width: 100%
@@ -372,7 +428,11 @@ table {
 }
 .prod_img img {
     max-width: -webkit-fill-available;
+    max-width: -moz-available;
+    max-width: fill-available;
     max-height: -webkit-fill-available;
+    max-height: -moz-available;
+    max-height: fill-available;
     margin: auto
 }
 .prod_info h4 {
@@ -380,6 +440,14 @@ table {
 }
 .prod_info span {
     color: green
+}
+.qr_ {
+    width: 300px;
+    text-align: center;
+}
+.qr_ img{
+    width: 100%;
+    height: 100%;
 }
 .struc_{
     list-style: none
@@ -435,13 +503,20 @@ table {
 /* Orders Aand Users */
 
 /*Admin Add Product*/
+.traverse_en {
+    direction: ltr;
+}
+.traverse_ar {
+    direction: rtl
+}
 .admin_prod_img {
 
     text-align: center;
 }
 .admin_prod_img img {
     max-width: -webkit-fill-available;
-    max-height: -webkit-fill-available;
+    max-width: -moz-available;
+    max-width: fill-available;
 }
 .upload_form {
     padding: 5px;
@@ -486,10 +561,62 @@ table {
     width: 100%;
     text-align: center;
 }
-
 .done {
     width: 80%;
+    margin-top: 5px
 }
+
+.prod_table {
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.prod_table th,
+.prod_table td {
+    padding: 6px 15px;
+}
+.prod_table th {
+    background: #6cc16c;
+    color: #fff;
+    text-align: center;
+}
+.prod_table tr:first-child th:first-child {
+    border-top-left-radius: 6px;
+}
+.prod_table tr:first-child th:last-child {
+    border-top-right-radius: 6px;
+}
+.prod_table td {
+    border-right: 1px solid #c6c9cc;
+    border-bottom: 1px solid #c6c9cc;
+}
+.prod_table td:first-child {
+    border-left: 1px solid #c6c9cc;
+}
+.prod_table tr:nth-child(even) td {
+    background: #eaeaed;
+}
+.prod_table tr:last-child td:first-child {
+    border-bottom-left-radius: 6px;
+}
+.prod_table tr:last-child td:last-child {
+    border-bottom-right-radius: 6px;
+}
+.hide {
+    display: none;
+}
+@media screen and (max-width: 750px) {
+    .prod_table textarea.well {
+        width: 130px
+    }
+} 
+@media screen and (max-width: 375px) {
+    .prod_table textarea.well {
+        width: 100px
+    }
+}
+
 
 /*Admin Add Product*/
 
@@ -500,7 +627,7 @@ table {
     background-color: #6CC16C;
     padding-top: 15px;
     padding-bottom: 15px;
-
+    margin-top: 10px
 }
 .footer .icon
 {

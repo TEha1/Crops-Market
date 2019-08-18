@@ -1,57 +1,64 @@
 <?php
-
+//finish
 /*
  * *this is the login controller in first we check if user email exist in database or not 
  * *and if it exist get password and compare with password he was enter and if equal
  * *redirect to home.php and insert his info in session
  */
-include '../Resources/Ln/arabic_ln.php';
-if (!isset($_SESSION)) {
-    session_start();
-}
-if ($_POST['submit'] == 'Login' || $_POST['submit'] == $NavBar["login"] ) {
+if (!isset($_SESSION)) {session_start();}
+if (isset($_POST['Login'])) {
     try {
-        if ($_POST['email'] == 'admin@lotus.com') {
+        if($_POST['email']=='manager@lotus.com')
+        {
+            $_SESSION['manegerlog'] = 1;
+            $_SESSION['email'] = filter_var($_POST['email'],FILTER_SANITIZE_EMAIL);
+            $_SESSION['password'] = filter_var($_POST['password'],FILTER_SANITIZE_STRING);
+            header('Location: ' . filter_var('loginManagerController.php', FILTER_SANITIZE_URL));
+        }
+        elseif (preg_match("/^(admin).+(@lotus.com)$/", $_POST['email'])) {
             $_SESSION['adminlog'] = 1;
-            $_SESSION['email'] = $_POST['email'];
-            $_SESSION['password'] = $_POST['password'];
+            $_SESSION['email'] = filter_var($_POST['email'],FILTER_SANITIZE_EMAIL);
+            $_SESSION['password'] = filter_var($_POST['password'],FILTER_SANITIZE_STRING);
             header('Location: ' . filter_var('loginAdminController.php', FILTER_SANITIZE_URL));
         }
-        $user_data['email'] = $_POST['email'];
-        //Initialize User class
-        include_once '../Models/userClass.php';
-        $user = new User();
-        $result = $user->LogIn($user_data);
-        if ($result != false) {
-            if ($result[0]['password'] == $_POST['password']) {
-                if ($result[0]['block'] == 0) {
-                    $_SESSION['id'] = $result[0]['id'];
-                    $_SESSION['oauth_provider'] = $result[0]['oauth_provider'];
-                    $_SESSION['first_name'] = $result[0]['first_name'];
-                    $_SESSION['last_name'] = $result[0]['last_name'];
-                    $_SESSION['email'] = $result[0]['email'];
-                    $_SESSION['gender'] = $result[0]['gender'];
-                    $_SESSION['picture'] = $result[0]['picture'];
-                    if (isset($result[0]['phone'])) {
-                        //if user is exist and have phone number in database it will store in session
-                        $_SESSION['phone'] = $result[0]['phone'];
+        else
+        {
+            $user_data['email'] = filter_var($_POST['email'],FILTER_SANITIZE_EMAIL);
+            include_once '../Models/userClass.php';
+            $user = new User();
+            $result = $user->LogIn($user_data);
+            if ($result != false) {
+                if ($result['password'] == filter_var($_POST['password'],FILTER_SANITIZE_STRING)) {
+                    if ($result['block'] == 0) {
+                        $_SESSION['id']             = $result['id'];
+                        $_SESSION['oauth_provider'] = $result['oauth_provider'];
+                        $_SESSION['first_name']     = $result['first_name'];
+                        $_SESSION['last_name']      = $result['last_name'];
+                        $_SESSION['email']          = $result['email'];
+                        $_SESSION['gender']         = $result['gender'];
+                        $_SESSION['picture']        = $result['picture'];
+                        $_SESSION['phone']          = $result['phone'];
+                        header('Location: ' . filter_var('../Veiw/home.php', FILTER_SANITIZE_URL));
+                    } else {
+                        //echo 'block';
+                        header('Location: ' . filter_var('../Veiw/home.php', FILTER_SANITIZE_URL));
                     }
-                    //print_r($_SESSION);
-                    header('Location: ' . filter_var('../Veiw/home.php', FILTER_SANITIZE_URL));
                 } else {
-                    echo 'block';
+                    //Wrong password find an idea
+                    //echo'Wrong password find an idea';
+                    header('Location: ' . filter_var('../Veiw/home.php?notify=wrong_password', FILTER_SANITIZE_URL));
                 }
             } else {
-                //Wrong password find an idea
-                echo'Wrong password find an idea';
+                //Wrong email find an idea
+                //echo 'Wrong email find an idea';
+                header('Location: ' . filter_var('../Veiw/home.php?notify=wrong_email', FILTER_SANITIZE_URL));
             }
-        } else {
-            //Wrong email find an idea
-            echo 'Wrong email find an idea';
         }
+        
     } catch (Exception $ex) {
         //someting wrong find an idea
-        echo $ex->getMessage();
+        //echo $ex->getMessage();
+        header('Location: ' . filter_var('../Veiw/home.php?notify=wrong_in_system', FILTER_SANITIZE_URL));
     }
 } else {
     //someone go direct to this page and route to home

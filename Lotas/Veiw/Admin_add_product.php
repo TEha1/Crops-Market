@@ -13,23 +13,23 @@ include './NavBar.php';
     <form action="../Controllers/addProductController.php" method="POST" enctype="multipart/form-data" >
         <ul class="nav nav-tabs nav-justified">
             <?php
-                echo '<li class="active"><a href="#defention" data-toggle="pill">' . $Admin_Product["definition"] . '</a></li>
+            echo '<li class="active"><a href="#defention" data-toggle="pill">' . $Admin_Product["definition"] . '</a></li>
                 <li><a href="#structure" data-toggle="pill">' . $Admin_Product["structure"] . '</a></li>
                 <li><a href="#usingWay" data-toggle="pill">' . $Admin_Product["using_way"] . '</a></li>
-                <li><a href="#advantages" data-toggle="pill">' . $Admin_Product["advantages"] . '</a></li>';
+                <li><a href="#advantages" data-toggle="pill">' . $Admin_Product["rate_of_use"] . '</a></li>';
             ?>
 
         </ul>
         <div class="tab-content">
             <div id="defention" class="tab-pane fade in active">
-                <a class="btn btn-primary english_defenition_btn">En</a>
+                <a class="btn btn-primary english_defenition_btn ">En</a>
                 <hr>
-                <div class="row english_defenition prod_info" style="display: none">
+                <div class="row english_defenition prod_info traverse_en" style="display: none">
                     <div class="col-sm-5 well " >
                         <div class=" admin_prod_img">
                             <img src="https://placehold.it/270x357?text=IMAGE">
                         </div>
-                        <div class="text-center upload_form" >
+                        <div class="text-center upload_form">
                             <input required="required" type="file" name="image">
                         </div><br>
                         <div class="form-group">
@@ -40,116 +40,153 @@ include './NavBar.php';
                                 $category = new Category();
                                 $data = $category->getAllCategories();
                                 foreach ($data as $cat) {
-                                    echo '<option value="' . $cat['id'] . '">' . $cat['name_en'] . '</option>';
+                                    echo '<option value="' . $cat['id'] . '">' . $cat['name'] . '</option>';
                                 }
                                 ?>
                             </select>
                         </div>
                     </div>
                     <div class="col-sm-7 prod_info ">
-                        <h4 class="">Name:</h4>
-                        <input class="well header_test" type="text" name="name_en" maxlength="100" required placeholder="English Name">
-                        <h4 class="">Definition:</h4>
-                        <div class="new_definition well text-center">
-                            <textarea class="well" name="script_en" placeholder="English Script" required maxlength="545"></textarea>
-                        </div>
+                        <?php
+                        echo '
+                        <h4 class="">' . $English["product_name"] . ':</h4>
+                        <input id="productName" class="well header_test" type = "text" name ="name" maxlength = "100" required placeholder = "English Name">
+                        <b id="notMateched_1" class="not_matched">not matched</b>
+                        ';
+                        ?>
                     </div>
                 </div>
-                <a class="btn btn-primary arabic_defenition_btn">Ar</a>
+                <a class="btn btn-primary arabic_defenition_btn ">Ar</a>
                 <hr>
-                <div class=" arabic_defenition">
+                <div class=" arabic_defenition traverse_ar">
                     <?php
                     echo '<div class="prod_info">
-                                <h4 class="">' . $Admin_Product["product_name"] . ':</h4>
-                                <input class="well header_test" type="text" name="name_ar" placeholder="English Name">
-                                <div class="form-group">
-                                    <span>' . $Admin_Product["select_category"] . ':</span><br>
-                                    <select name="category" class="" required style="width: 50%; height: 35px; border-radius: 5px;">';
-                    include_once "../Models/categoryClass.php";
-                    $category = new Category();
-                    $data = $category->getAllCategories();
-                    foreach ($data as $cat) {
-                        echo '<option value = "' . $cat['id'] . '">' . $cat['name_en'] . '</option > ';
-                    }
-                    echo '</select>
-                                </div>
-                                <h4 class="">' . $Admin_Product["definition"] . ':</h4>
-                                <div class="new_definition well text-center">
-                                    <textarea class="well" name="script_ar" placeholder="Arabic Script" required maxlength="545"></textarea>
-                                </div>
-                            </div>';
+                                <h4 class="">' . $Arabic["product_name"] . ':</h4>
+                                <input id="productNameAr" class="well header_test" type="text" name="name_ar" placeholder="Arabic Name">
+                                <b id="notMateched_2" class="not_matched">not matched</b>
+                                
+                     </div>';
                     ?>
 
                 </div>
             </div>
-            <div id="structure" class="tab-pane fade product_struct well">
+            <div id="structure" class="tab-pane fade product_struct well ">
                 <a class="btn btn-primary english_structure_btn">En</a>
                 <hr>
-                <ul class="struc_ english_structure">
-                    <li>Effective Material:</li>
-                    <textarea class="well"  maxlength="545"></textarea>
+                <?php
+                echo '<ul class="struc_ english_structure traverse_en">
+                        <li>' . $English["active_ingredient"] . ':</li>
+                        <textarea class="well"  maxlength="545" name="active_ingredient"></textarea>
 
-                    <li>Chemical Group:</li>
-                    <textarea class="well"  maxlength="545"></textarea>
+                        <li>' . $English["properties"] . ':</li>
+                        <textarea class="well"  maxlength="545" name="properties"></textarea>
 
-                    <li>Chemical Increase:</li>
-                    <textarea class="well"  maxlength="545"></textarea>
-                </ul>
-                <a class="btn btn-primary arabic_structure_btn">Ar</a>
+                        <li>' . $English["features"] . ':</li>
+                        <textarea class="well"  maxlength="545" name="features"></textarea>
+                    </ul>';
+                ?>
+
+                <a class="btn btn-primary arabic_structure_btn ">Ar</a>
                 <hr>
                 <?php
-                echo '<ul class="struc_ arabic_structure">
-                        <li>' . $Admin_Product["effective_material"] . ':</li>
-                        <textarea class="well"  maxlength="545"></textarea>
+                echo '<ul class="struc_ arabic_structure traverse_ar">
+                        <li>' . $Arabic["active_ingredient"] . ':</li>
+                        <textarea class="well"  maxlength="545" name="active_ingredient_ar"></textarea>
 
-                        <li>' . $Admin_Product["chemical_group"] . ':</li>
-                        <textarea class="well"  maxlength="545"></textarea>
+                        <li>' . $Arabic["properties"] . ':</li>
+                        <textarea class="well"  maxlength="545" name="properties_ar"></textarea>
 
-                        <li>' . $Admin_Product["chemical_increase"] . ':</li>
-                        <textarea class="well"  maxlength="545"></textarea>
+                        <li>' . $Arabic["features"] . ':</li>
+                        <textarea class="well"  maxlength="545" name="features_ar"></textarea>
                     </ul>';
                 ?>
 
             </div>
             <div id="usingWay" class="tab-pane fade product_struct well">
                 <ul class="well struc_">
-                    <a class="btn btn-primary english_usingway_btn">En</a>
-                    <hr>
-                    <div class="english_usingway">
-                        <li>How To Use:</li>
-                        <textarea class="well"  maxlength="545"></textarea>
-                    </div>
-                    <a class="btn btn-primary arabic_usingway_btn">Ar</a>
-                    <hr>
-                    <div class="arabic_usingway">
-                        <?php
-                        echo '<li>' . $Admin_Product["how_to_use"] . ':</li>';
-                        ?>
-
-                        <textarea class="well"  maxlength="545"></textarea>
-                    </div>
-                    <li>Explanation Video URL:</li>
-                    <textarea class="well" name ="video" placeholder="YouTube ID" required maxlength="545"></textarea>
+                   
+                    <li><?php echo $Admin_Product['explanation_video_id'] ?>:</li>
+                    <textarea class="well" name ="video" placeholder="" required maxlength="545"></textarea>
                     <input class="well header_test" type="number" name="price" placeholder="Price">
                 </ul>
             </div>
-            <div id="advantages" class="tab-pane fade new_definition well">
-                <a class="btn btn-primary english_advantages_btn">En</a>
-                <hr>
-                <textarea class="well english_advantages "  maxlength="545"></textarea>
+            <div id="advantages" class="tab-pane fade">
 
-                <a class="btn btn-primary arabic_advantages_btn">Ar</a>
-                <hr>
-                <textarea class="well arabic_advantages "  maxlength="545"></textarea>
+                <div class="container-fluid" style="overflow-x: auto">
+                    <table id="prodTable" class="prod_table">
+                        <tr>
+                            <?php
+                            echo '
+                <th>Number</th>
+                <th>' . $ProductInfo["crops"] . '</th>
+                <th>' . $ProductInfo["controlled_pest"] . '</th>
+                <th>' . $ProductInfo["rate_of_use"] . '</th>
+                <th>' . $ProductInfo["phi"] . '</th>';
+                            ?>
+                        </tr>
+                        
+                        <tr>
+                            <td></td>
+                            <td>
+                                <textarea class="well traverse_en" type="text" name="1" placeholder="Field Crops" required ></textarea>
+                                <br>
+                                <textarea class="well traverse_ar"  type="text" name="5" placeholder="المحاصيل الزراعيه"required></textarea>
+                            </td>
+                            <td>
+                                <textarea class="well traverse_en" type="text" name="2" placeholder="Controlled Pest" required></textarea>
+                                <br>
+                                <textarea class="well traverse_ar"  type="text" name="6" placeholder="الحشرات المكافحه" required></textarea>
+                            </td>
+                            <td>
+                                <textarea class="well traverse_en" type="text" name="3" placeholder="Rate Of Use" required></textarea>
+                                <br>
+                                <textarea class="well traverse_ar"  type="text" name="7" placeholder="نسبه الاستعمال" required></textarea>
+                            </td>
+                            <td>
+                                <textarea class="well traverse_en" type="text" name="4" placeholder="PHI" required></textarea>
+                                <br>
+                                <textarea class="well traverse_ar"  type="text" name="8" placeholder="نسيه الامان" required></textarea>
+                            </td>
+                        </tr>
+                        <?php 
+                        for($i=1; $i<5; $i++) {
+                            $s = ($i*8)+1;
+                            echo '<tr>
+                            <td><a class="btn btn-success clearField">clear</a></td>
+                            <td>
+                                <textarea class="well traverse_en" type="text" name="'.$s.'" placeholder="' . $ProductInfo["crops"] . '" ></textarea><br>
+                                <textarea class="well traverse_ar"  type="text" name="'. ($s+4) .'" placeholder="المحاصيل الزراعيه" ></textarea>
+                            </td>
+                            <td>
+                                <textarea class="well traverse_en" type="text" name="'.($s+1) .'" placeholder="' . $ProductInfo["controlled_pest"] . '" ></textarea><br>
+                                <textarea class="well traverse_ar"  type="text" name="'.($s+5) .'" placeholder="الحشرات المكافحه" ></textarea>
+                            </td>
+                            <td>
+                                <textarea class="well traverse_en" type="text" name="'.($s+2) .'" placeholder="' . $ProductInfo["rate_of_use"] . '" ></textarea><br>
+                                <textarea class="well traverse_ar"  type="text" name="'.($s+6) .'" placeholder="نسبه الاستعمال" ></textarea>
+                            </td>
+                            <td>
+                                <textarea class="well traverse_en" type="text" name="'.($s+3) .'" placeholder="' . $ProductInfo["phi"] . '" ></textarea><br>
+                                <textarea class="well traverse_ar"  type="text" name="'.($s+7) .'" placeholder="نسبه الامان" ></textarea>
+                            </td>
+                        </tr>';
+                        }
+                        ?>
+
+                    </table>
+                </div>
+
 
             </div>
         </div>
         <div class="done_container">
-            <input type="submit" name="submit" value="addProduct"
-                   class="btn btn-success btn-md done">
+            <input id="addProduct__" type="button" name="addProduct" value="Add"
+                   class="btn btn-success btn-md done disabled">
         </div>
     </form>    
 </div>
 <script src="../Resources/JS/add_prod.js"></script>
+
+<script src="../Resources/JS/productTable.js"></script>
 <?php
 include './footer.php';

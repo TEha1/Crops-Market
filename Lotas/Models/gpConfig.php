@@ -8,7 +8,7 @@ include_once 'Google/contrib/Google_Oauth2Service.php';
 
 $clientId = '1024606970921-45ac7ppjg3ke5g5amcip09i5lfc9dv61.apps.googleusercontent.com'; 
 $clientSecret = 'q5WPV0sitv-1nteW8G-0mNOT'; 
-$redirectURL = 'http://localhost/Lotas/Controllers/googleUserController.php'; 
+$redirectURL = 'https://teha43.000webhostapp.com/Controllers/googleUserController.php'; 
 
 //Call Google API
 $gClient = new Google_Client();

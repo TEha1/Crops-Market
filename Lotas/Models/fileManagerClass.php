@@ -41,13 +41,13 @@ class fileManger
     */
     public function delete($fileDir)
     {
-        if (!unlink($fileDir))
+        if (@!unlink($fileDir))
         {
-            return TRUE;
+            return true;
         }
         else
         {
-            return FALSE;
+            return true;
         }
     }
 }

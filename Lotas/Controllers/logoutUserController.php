@@ -1,12 +1,10 @@
 <?php
+//finish
 /*
 **this is log out controller check the oauth_provider and distroy $_SESSION
 **and if you not loged in you routed to home.php
 */
-if(!isset($_SESSION))
-{
-	session_start();
-}
+if(!isset($_SESSION)){session_start();}
 if(isset($_SESSION['oauth_provider']))
 {
     //if i log in with gmail i will distroy $gClient and $google_oauthV2
@@ -29,6 +27,7 @@ if(isset($_SESSION['oauth_provider']))
         include_once '../Models/userClass.php';
         $user = new User();
         $user->LogOut();
+        if(!isset($_SESSION)){session_start();}
         header('Location: ' . filter_var('../Veiw/home.php', FILTER_SANITIZE_URL));
     }
     catch (Exception $ex) 

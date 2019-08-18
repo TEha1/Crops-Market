@@ -2,50 +2,53 @@
 include_once 'DB.php';
 class Category
 {
-    /*
-    **check if category is already exist or not
-    **is exist return false
-    **is inserted return Inserted
-    **is not inserted return "Not Inserted"
-    */
-    public function addCategory($name_en,$name_ar)
+    private $id         = 'id' ;
+    private $name       = 'name' ;
+    private $name_ar    = 'name_ar' ;
+    private $category   = 'category' ;
+    public function checkCategory($name = "", $name_ar = "")
     {
         $db = new DB();
-        $querySelect = "SELECT * 
+        $querySelect = "SELECT $this->id
                         FROM 
-                            `category` 
+                            $this->category 
                         WHERE 
-                            `name_en` ='".$name_en."'
+                            $this->name ='" . $name . "'
                         OR 
-                            `name_ar` ='".$name_ar."'";
+                            $this->name_ar = '" . $name_ar . "'";
         $result = $db->prepare($querySelect);
         $result->execute();
+        $db=NULL;
         if($result->rowCount() > 0)
         {
             return false;
         }
         else
         {
-            $queryInsert = "INSERT INTO 
-                                `category` 
-                                (`name_en`, 
-                                `name_ar`) 
-                            VALUES 
-                                ('".$name_en.
-                                "', '".$name_ar."')";
-            $sql = $db->prepare($queryInsert);
-            $result = $sql->execute();
-            if(!$result)
-            {
-                $db = NULL;
-                return 'Not Inserted';
-            }
-            else
-            {
-                $db = NULL;
-                return $result;
-            }
+            return true;
         }
+    }
+    /*
+    **check if category is already exist or not
+    **is exist return false
+    **is inserted return Inserted
+    **is not inserted return "Not Inserted"
+    */
+    public function addCategory($name,$name_ar)
+    {
+        $db = new DB();
+        $queryInsert = "INSERT INTO 
+                            $this->category 
+                            ($this->name, 
+                            $this->name_ar) 
+                        VALUES 
+                            ('".$name.
+                            "', '".$name_ar."')";
+        $sql = $db->prepare($queryInsert);
+        $result = $sql->execute();
+        $db = NULL;
+        if(!$result){return 'Not Inserted';}else{return $result;}
+        
     }
     /*
     **delete category by id and return true if deleted and false id not deleted
@@ -53,29 +56,37 @@ class Category
     public function deleteCategory($id)
     {
         $db = new DB(); 
-        $query = "DELETE FROM `category` WHERE `id`= ".$id;
+        $query = "DELETE FROM $this->category WHERE $this->id= ".$id;
         $stm = $db->prepare($query);
-        if($stm->execute())
-        {
-            $db = NULL;
-            return TRUE;   
-        } 
-        else 
-        {
-            $db = NULL;
-            return false;    
-        }
+        $db = NULL;
+        if($stm->execute()){return TRUE;} else {return false;}
     }
     /*
     **function getAllCategories return all categories
     */
     public function getAllCategories()
     {
-        $query = "SELECT * FROM `category`";
+        if($_SESSION['lang']=='ar')
+        {
+            $query = "SELECT
+                        $this->name_ar as name,
+                        $this->id
+                    FROM
+                        $this->category";
+        }
+        else
+        {
+            $query = "SELECT 
+                        $this->name as name,
+                        $this->id
+                    FROM 
+                    $this->category";
+        }
         $db = new DB();
         $result = $db->prepare($query);
         $result->execute();
         $data =$result->fetchAll();
+        $db = NULL;
         return $data;
     }
 }

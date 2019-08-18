@@ -81,7 +81,32 @@ echo'<form action="../Controllers/invisibleProductController.php" method="post">
     <input type="submit" name="submit" value="Visible">
 </form>';
 */
-
+//GetProductByLIMITAr
+/*
+include_once 'productClass.php';
+$product = new Product();
+$data = $product->GetProductByLIMITAr(1);
+print_r($data);
+*/
+//getNumberOfProduct
+/*
+include_once 'productClass.php';
+$product = new Product();
+$_SESSION['lang'] ='en';
+$data = $product->getProduct(31);
+print_r($data);
+if($data == false)
+{
+    echo 'false';
+}
+*/
+echo  $_SERVER['PHP_SELF'];
+echo $_SERVER['SCRIPT_FILENAME'];
+echo $_SERVER['REQUEST_URI'];
+echo  $_SERVER['HTTP_HOST'];
+echo $_SERVER['QUERY_STRING'];
+//checkProduct
+//echo ' <a href="../Controllers/checkProductController.php?name=s&name_ar=s">CheckProduct</a>';
 ///////////////////////////////////////////////////////////////////////////////////
 
 /*
@@ -164,4 +189,3 @@ $num1 = 49;
 $num2 =ceil ($num1 / 5);
 echo $num2;
 */
-echo ' <a href="../Veiw/testveiw.php?c=7">test<\a>';

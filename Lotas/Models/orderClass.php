@@ -2,117 +2,92 @@
 include_once 'DB.php';
 class Order
 {
+    private $id             = 'id';
+    private $product        = 'product';
+    private $user           = 'user';
+    private $quantity       = 'quantity';
+    private $orders         = 'orders';
+    private $dateOfOrder    ='dateOfOrder';
+    
     public function addOrder($userId, $productId , $quantity)
     {
         $query = "INSERT INTO
-                        `orders`
+                        $this->orders
                     SET 
-                        product = '".$productId."',
-                        user = '".$userId."',
-                        quantity = '".$quantity."'";
+                        $this->product = '".$productId."',
+                        $this->user = '".$userId."',
+                        $this->quantity = '".$quantity."'";
         $db = new DB();
         $insert = $db->prepare($query);
         $insert->execute();
         $db = NULL;
     }
-    public function deleteOrder($id)
+    public function deleteOrder($id,$userId='')
     {
         $db = new DB(); 
-        $query = "DELETE FROM `orders` WHERE `id`= ".$id;
-        $stm = $db->prepare($query);
-        if($stm->execute())
+        if(isset($_SESSION['admin']))
         {
-            $db = NULL;
-            return TRUE;   
-        } 
-        else 
-        {
-            $db = NULL;
-            return false;    
+            $query = "DELETE FROM $this->orders WHERE $this->id = $id";
         }
-    }
-    public function deleteOrderByUser($userId,$orderId)
-    {
-        $db = new DB(); 
-        $query = "DELETE FROM `orders` WHERE `id`= ".$orderId." AND `user` = ".$userId;
-        $stm = $db->prepare($query);
-        if($stm->execute())
+        else
         {
-            $db = NULL;
-            return TRUE;   
-        } 
-        else 
-        {
-            $db = NULL;
-            return false;    
+            $query = "DELETE FROM $this->orders WHERE $this->id = $id AND $this->user = $userId";
         }
+        
+        $stm = $db->prepare($query);
+        $db = NULL;
+        if($stm->execute()){return TRUE;} else {return false;}
     }
     public function updateOrder($id,$quantity,$userId)
     {
         $db = new DB(); 
         $query = "UPDATE
-                    `orders` 
+                    $this->orders 
                 SET 
-                    `quantity` = '".$quantity."' 
+                    $this->quantity = '".$quantity."' 
                 WHERE 
-                    `id` = ".$id."
+                    $this->id = ".$id."
                 AND 
-                `user` =".$userId;
+                $this->user =".$userId;
         $stm = $db->prepare($query);
-        if($stm->execute())
-        {
-            $db = NULL;
-            return TRUE;
-        } 
-        else 
-        {
-            $db = NULL;
-            return FALSE; 
-        }
+        if($stm->execute()){return TRUE;}else{return false;}
 
     }
-    public function getNumberOfOrders()
+    public function getNumberOfOrders($userId='')
     {
-        $query = "SELECT * FROM `orders`";
+        if(isset($_SESSION['admin']))
+        {
+            $query = "SELECT COUNT(id) as num  FROM $this->orders";
+        }
+        else
+        {
+            $query = "SELECT COUNT($this->id) as num  FROM `orders` WHERE `user` = $userId";
+        }
         $db = new DB();
         $result = $db->prepare($query);
         $result->execute();
-        $data = $result->rowCount();
+        $data = $result->fetch();
         $db = NULL;
-        return $data;
+        return $data['num'];
     }
-    public function GetOrdersByLIMIT($pageid)
+    public function GetOrdersByLIMIT($pageid,$userId='')
     {
-        $db = new DB();
         $start = 10*($pageid-1);
         $row = 10;
-        $query = "SELECT * FROM `orders` ORDER BY `dateOfOrder` DESC LIMIT $start,$row";
+        if(isset($_SESSION['admin']))
+        {
+            $query = "SELECT * FROM $this->orders ORDER BY $this->dateOfOrder DESC LIMIT $start,$row";
+        }
+        else
+        {
+            $query = "SELECT * FROM $this->orders WHERE $this->user = $userId ORDER BY $this->dateOfOrder DESC LIMIT $start,$row ";
+        }
+        $db = new DB();
         $stm = $db->prepare($query);
         $stm->execute();
         $result = $stm->fetchAll();
         $db = NULL;
         return $result;
     }
-    public function getNumberOfOrdersOfUser($userId)
-    {
-        $query = "SELECT * FROM `orders` WHERE `user` =" .$userId;
-        $db = new DB();
-        $result = $db->prepare($query);
-        $result->execute();
-        $data = $result->rowCount();
-        $db = NULL;
-        return $data;
-    }
-    public function GetOrdersByLIMITUser($pageid,$userId)
-    {
-        $db = new DB();
-        $start = 10*($pageid-1);
-        $row = 10;
-        $query = "select * from `orders` WHERE `user` = $userId ORDER BY `dateOfOrder` DESC LIMIT  $start,$row ";
-        $stm = $db->prepare($query);
-        $stm->execute();
-        $result = $stm->fetchAll();
-        $db = NULL;
-        return $result;
-    }
+    
 }
